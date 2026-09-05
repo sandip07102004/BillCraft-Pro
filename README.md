@@ -2,7 +2,7 @@
 
 A modern, high-performance web billing and invoice management platform built with pure Vanilla JavaScript, responsive CSS, and cloud synchronization powered by Supabase.
 
-![BillCraft Pro Banner]([assets/preview.png](https://github.com/sandip07102004/BillCraft-Pro/blob/3f7de2a99f06db82e5ee862baa562dc2c51eb075/INV-2026-9527_Apex_Global_Enterprises_page-0001.jpg))
+![image alt](https://github.com/sandip07102004/BillCraft-Pro/blob/2aa1484ce366f069380fb4063fb2a2c413dc5558/INV-2026-9527_Apex_Global_Enterprises_page-0001.jpg)
 
 ## 🌟 Key Features
 
