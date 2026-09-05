@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In & Sign Up — BillCraft Pro</title>
+  <meta name="description" content="Sign in or create an account with BillCraft Pro with secure email authentication.">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #1E40AF;
+      --primary-hover: #1D4ED8;
+      --primary-dark: #1E3A8A;
+      --primary-light: #DBEAFE;
+      --primary-subtle: #EFF6FF;
+      --secondary: #2563EB;
+      --accent: #3B82F6;
+      --accent-light: #93C5FD;
+      --bg-app: #F8FAFC;
+      --bg-surface: #FFFFFF;
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --text-light: #94A3B8;
+      --text-inverse: #FFFFFF;
+      --border-color: #E2E8F0;
+      --border-focus: #2563EB;
+      --danger: #EF4444;
+      --danger-bg: #FEF2F2;
+      --success: #10B981;
+      --success-bg: #ECFDF5;
+      --warning: #F59E0B;
+      --warning-bg: #FFFBEB;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 3px 0 rgba(15,23,42,0.08), 0 1px 2px -1px rgba(15,23,42,0.08);
+      --shadow-xl: 0 20px 25px -5px rgba(15,23,42,0.1), 0 8px 10px -6px rgba(15,23,42,0.05);
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Native Cross-Document View Transitions */
+    @view-transition {
+      navigation: auto;
+    }
+
+    ::view-transition-old(root) {
+      animation: 140ms cubic-bezier(0.4, 0, 1, 1) both pageFadeOut;
+    }
+
+    ::view-transition-new(root) {
+      animation: 200ms cubic-bezier(0.16, 1, 0.3, 1) both pageFadeIn;
+    }
+
+    @keyframes pageFadeOut {
+      from { opacity: 1; transform: scale(1); }
+      to { opacity: 0; transform: scale(0.995); }
+    }
+
+    @keyframes pageFadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      font-family: var(--font-family);
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+    }
+
+    /* Page Entrance & Exit Transitions */
+    body {
+      opacity: 1;
+      transition: opacity 0.16s var(--ease-spring), transform 0.16s var(--ease-spring);
+      will-change: opacity, transform;
+    }
+
+    body.page-exit {
+      opacity: 0;
+      transform: translateY(-4px);
+      pointer-events: none;
+    }
+
+    /* ======================================================================
+       LAYOUT
+       ====================================================================== */
+    .login-container {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+      animation: pageContentEnter 0.35s var(--ease-spring) both;
+      will-change: opacity, transform;
+    }
+
+    @keyframes pageContentEnter {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ======================================================================
+       LEFT PANEL — BRANDING
+       ====================================================================== */
+    .brand-panel {
+      flex: 1;
+      background: linear-gradient(145deg, #0F172A 0%, #1E3A8A 40%, #1E40AF 70%, #2563EB 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding: 60px 48px;
+    }
+
+    .brand-panel::before,
+    .brand-panel::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.25;
+      animation: float 8s ease-in-out infinite;
+      will-change: transform;
+      transform: translate3d(0, 0, 0);
+      backface-visibility: hidden;
+    }
+    .brand-panel::before { width: 400px; height: 400px; background: #3B82F6; top: -80px; left: -100px; }
+    .brand-panel::after { width: 350px; height: 350px; background: #60A5FA; bottom: -60px; right: -80px; animation-delay: -4s; }
+
+    @keyframes float {
+      0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+      33% { transform: translate3d(25px, -20px, 0) scale(1.04); }
+      66% { transform: translate3d(-15px, 15px, 0) scale(0.96); }
+    }
+
+    .grid-pattern {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    .brand-content { position: relative; z-index: 2; text-align: center; max-width: 440px; }
+
+    .brand-logo {
+      width: 72px; height: 72px;
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 28px;
+      animation: logoEntry 0.8s var(--ease-spring) both;
+    }
+
+    @keyframes logoEntry {
+      from { opacity: 0; transform: scale(0.5) rotate(-10deg); }
+      to { opacity: 1; transform: scale(1) rotate(0deg); }
+    }
+
+    .brand-logo svg { color: #FFFFFF; }
+
+    .brand-heading {
+      font-size: 2.25rem; font-weight: 800; color: #FFFFFF;
+      line-height: 1.15; letter-spacing: -0.03em; margin-bottom: 8px;
+      animation: textFadeUp 0.7s var(--ease-spring) 0.15s both;
+    }
+
+    .brand-heading .highlight {
+      background: linear-gradient(135deg, #60A5FA, #93C5FD);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    .brand-tagline {
+      font-size: 1.0625rem; font-weight: 400; color: rgba(255,255,255,0.65);
+      line-height: 1.6; margin-bottom: 40px;
+      animation: textFadeUp 0.7s var(--ease-spring) 0.3s both;
+    }
+
+    @keyframes textFadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .feature-list {
+      list-style: none; text-align: left;
+      display: flex; flex-direction: column; gap: 14px;
+      animation: textFadeUp 0.7s var(--ease-spring) 0.45s both;
+    }
+
+    .feature-list li {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 0.9375rem; color: rgba(255,255,255,0.8);
+    }
+
+    .feature-icon {
+      width: 36px; height: 36px; min-width: 36px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .feature-icon svg { color: #93C5FD; }
+
+    .floating-cards { position: absolute; z-index: 1; inset: 0; pointer-events: none; }
+
+    .float-card {
+      position: absolute;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    .float-card:nth-child(1) { width: 120px; height: 80px; top: 12%; left: 8%; animation: cardFloat 12s ease-in-out infinite; }
+    .float-card:nth-child(2) { width: 90px; height: 60px; bottom: 18%; right: 12%; animation: cardFloat 10s ease-in-out infinite 2s; }
+    .float-card:nth-child(3) { width: 100px; height: 70px; top: 65%; left: 15%; animation: cardFloat 14s ease-in-out infinite 4s; }
+
+    @keyframes cardFloat {
+      0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.4; }
+      50% { transform: translateY(-20px) rotate(3deg); opacity: 0.7; }
+    }
+
+    /* ======================================================================
+       RIGHT PANEL — AUTH
+       ====================================================================== */
+    .auth-panel {
+      width: 520px; min-width: 420px;
+      background: var(--bg-app);
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      padding: 48px;
+      position: relative; overflow-y: auto;
+    }
+
+    .auth-panel-inner {
+      width: 100%; max-width: 400px;
+      animation: panelSlideIn 0.6s var(--ease-spring) 0.2s both;
+    }
+
+    @keyframes panelSlideIn {
+      from { opacity: 0; transform: translateX(30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .auth-header { margin-bottom: 24px; }
+
+    .auth-header .welcome-text {
+      font-size: 0.875rem; font-weight: 500; color: var(--accent);
+      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
+    }
+
+    .auth-header h2 {
+      font-size: 1.75rem; font-weight: 700; color: var(--text-main);
+      letter-spacing: -0.02em; line-height: 1.2;
+    }
+
+    .auth-header p {
+      font-size: 0.9375rem; color: var(--text-muted); margin-top: 8px; line-height: 1.5;
+    }
+
+    /* Tabs */
+    .auth-tabs {
+      display: flex; gap: 4px;
+      background: #E2E8F0; border-radius: 10px; padding: 4px;
+      margin-bottom: 24px;
+    }
+
+    .auth-tab {
+      flex: 1; padding: 10px 20px; border: none; background: transparent;
+      font-family: var(--font-family); font-size: 0.875rem; font-weight: 600;
+      color: var(--text-muted); border-radius: 8px; cursor: pointer;
+      transition: all 0.25s var(--ease-spring);
+    }
+
+    .auth-tab.active {
+      background: #FFFFFF; color: var(--primary);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .auth-tab:hover:not(.active) { color: var(--text-main); }
+
+    /* Notices & Alerts */
+    .auth-notice {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      line-height: 1.45;
+      margin-bottom: 16px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .auth-notice.warning {
+      background: var(--warning-bg);
+      border: 1px solid #FCD34D;
+      color: #92400E;
+    }
+
+    .auth-notice.info {
+      background: var(--primary-subtle);
+      border: 1px solid var(--accent-light);
+      color: var(--primary-dark);
+    }
+
+    .auth-notice.success {
+      background: var(--success-bg);
+      border: 1px solid #A7F3D0;
+      color: #065F46;
+    }
+
+    .auth-notice.error {
+      background: var(--danger-bg);
+      border: 1px solid #FECACA;
+      color: #991B1B;
+    }
+
+    .auth-notice svg {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* Forms */
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      will-change: opacity, transform;
+    }
+
+    .form-fade-in {
+      animation: formFadeIn 0.22s var(--ease-spring) both;
+    }
+
+    @keyframes formFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .view-fade-in {
+      animation: viewFadeIn 0.26s var(--ease-spring) both;
+      will-change: opacity, transform;
+    }
+
+    @keyframes viewFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+
+    .form-label {
+      font-size: 0.8125rem; font-weight: 600; color: var(--text-main);
+      letter-spacing: 0.01em;
+    }
+
+    .form-label .optional {
+      font-weight: 400; color: var(--text-light); font-size: 0.75rem;
+    }
+
+    .form-input {
+      width: 100%; padding: 11px 14px;
+      border: 1.5px solid var(--border-color); border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      font-family: var(--font-family); font-size: 0.9375rem; color: var(--text-main);
+      outline: none; transition: all 0.2s var(--ease-spring);
+    }
+
+    .form-input:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .form-input::placeholder { color: var(--text-light); }
+    .form-input.error { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1); }
+
+    /* Password wrapper */
+    .password-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .password-wrapper .form-input {
+      padding-right: 44px;
+    }
+
+    .btn-toggle-pw {
+      position: absolute;
+      right: 10px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-light);
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      transition: color 0.2s;
+    }
+
+    .btn-toggle-pw:hover { color: var(--text-main); }
+
+    .form-error {
+      font-size: 0.75rem; color: var(--danger); display: none;
+      animation: shakeIn 0.35s var(--ease-spring);
+    }
+
+    .form-error.visible { display: block; }
+
+    @keyframes shakeIn {
+      0% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-3px); }
+      80% { transform: translateX(3px); }
+      100% { transform: translateX(0); }
+    }
+
+    /* Submit button */
+    .btn-submit {
+      width: 100%; padding: 12px 24px;
+      background: linear-gradient(135deg, var(--secondary), var(--primary));
+      color: var(--text-inverse);
+      font-family: var(--font-family); font-size: 0.9375rem; font-weight: 600;
+      border: none; border-radius: var(--radius-md);
+      cursor: pointer; position: relative; overflow: hidden;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+      transition: all 0.25s var(--ease-spring);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+      background: linear-gradient(135deg, #1D4ED8, #1E3A8A);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .btn-submit:active:not(:disabled) { transform: translateY(0); }
+    .btn-submit:disabled { opacity: 0.65; cursor: not-allowed; }
+
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.3);
+      border-top-color: #FFFFFF;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+
+    .btn-submit.loading .spinner { display: inline-block; }
+    .btn-submit.loading span { opacity: 0.8; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Links & Secondary Actions */
+    .btn-link {
+      background: none; border: none; padding: 0;
+      font-family: var(--font-family); font-size: 0.875rem; font-weight: 500;
+      color: var(--secondary); cursor: pointer; text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .btn-link:hover { color: var(--primary-dark); text-decoration: underline; }
+    .btn-link.text-muted { color: var(--text-muted); }
+    .btn-link.text-muted:hover { color: var(--text-main); }
+
+    /* ======================================================================
+       EMAIL VERIFICATION VIEW (ADJUSTED WINDOW)
+       ====================================================================== */
+    .verify-view {
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center;
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 34px 28px 28px;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+      width: 100%;
+      box-sizing: border-box;
+      animation: viewFadeIn 0.32s var(--ease-spring) both;
+    }
+
+    .verify-icon-wrapper {
+      width: 68px; height: 68px;
+      background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
+      border: 2px solid #BFDBFE;
+      border-radius: 22px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--secondary);
+      margin-bottom: 18px;
+      position: relative;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.15);
+    }
+
+    .verify-pulse {
+      position: absolute; inset: -6px;
+      border-radius: 26px;
+      border: 2px solid var(--accent);
+      opacity: 0.45;
+      animation: pulse 2.2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.45; }
+      50% { transform: scale(1.08); opacity: 0.1; }
+    }
+
+    .verify-title {
+      font-size: 1.45rem; font-weight: 700; color: var(--text-main);
+      letter-spacing: -0.015em;
+      margin-bottom: 6px;
+    }
+
+    .verify-desc {
+      font-size: 0.875rem; color: var(--text-muted); line-height: 1.45;
+      margin-bottom: 10px;
+    }
+
+    .verify-email-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #F8FAFC; border: 1.5px solid var(--border-color);
+      border-radius: 20px; padding: 6px 14px;
+      font-size: 0.875rem; font-weight: 600; color: var(--primary-dark);
+      margin-bottom: 16px; word-break: break-all;
+    }
+    .verify-email-badge svg { color: var(--secondary); flex-shrink: 0; }
+
+    .verify-live-status {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #ECFDF5; border: 1px solid #A7F3D0;
+      color: #065F46; font-size: 0.8125rem; font-weight: 600;
+      border-radius: 20px; padding: 6px 14px;
+      margin-bottom: 18px;
+    }
+
+    .pulse-status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #10B981;
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: dotPulse 1.8s infinite;
+    }
+
+    @keyframes dotPulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    .verify-instructions-card {
+      width: 100%;
+      background: #F8FAFC;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      margin-bottom: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-align: left;
+      box-sizing: border-box;
+    }
+
+    .verify-step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.8125rem;
+      color: #334155;
+      line-height: 1.45;
+    }
+
+    .step-num {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .verify-actions {
+      display: flex; flex-direction: column; gap: 12px;
+      align-items: center; width: 100%;
+    }
+
+    .btn-resend-primary {
+      width: 100%;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 11px 20px;
+      background: #FFFFFF;
+      border: 1.5px solid var(--secondary);
+      color: var(--secondary);
+      font-family: var(--font-family);
+      font-size: 0.875rem;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s var(--ease-spring);
+    }
+
+    .btn-resend-primary:hover:not(:disabled) {
+      background: var(--primary-subtle);
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    .btn-resend-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .resend-timer-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.8125rem; color: var(--text-muted);
+      background: #F1F5F9; border-radius: 8px; padding: 8px 16px;
+      width: 100%; justify-content: center; box-sizing: border-box;
+    }
+
+    .verify-nav-links {
+      display: flex; align-items: center; justify-content: center;
+      gap: 12px; margin-top: 4px;
+    }
+
+    .nav-sep { color: var(--border-color); }
+
+    .auth-footer {
+      text-align: center; margin-top: 24px; padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.8125rem; color: var(--text-light);
+    }
+
+    .auth-footer a { color: var(--text-muted); text-decoration: none; }
+    .auth-footer a:hover { color: var(--secondary); }
+
+    /* Toast */
+    .login-toast {
+      position: fixed; top: 24px; right: 24px; z-index: 9999;
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 20px; border-radius: var(--radius-md);
+      font-size: 0.875rem; font-weight: 500;
+      box-shadow: var(--shadow-xl);
+      transform: translateY(-20px); opacity: 0; pointer-events: none;
+      transition: all 0.35s var(--ease-spring);
+    }
+
+    .login-toast.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
+    .login-toast.success { background: #065F46; color: #FFFFFF; }
+    .login-toast.error { background: #991B1B; color: #FFFFFF; }
+    .login-toast.info { background: #1E40AF; color: #FFFFFF; }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .mobile-brand-banner {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .mobile-brand-logo {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: #FFFFFF;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(30, 64, 175, 0.25);
+    }
+    .mobile-brand-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .mobile-brand-title strong {
+      color: var(--secondary);
+      font-size: 0.6875rem;
+      background: var(--primary-subtle);
+      padding: 2px 7px;
+      border-radius: 999px;
+      margin-left: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    /* Responsive Multi-Device Styles */
+    @media (max-width: 900px) {
+      html, body {
+        overflow-y: auto !important;
+        height: auto !important;
+        min-height: 100%;
+      }
+      .login-container {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+        overflow-y: visible;
+      }
+      .brand-panel { display: none; }
+      .auth-panel {
+        width: 100%;
+        min-width: 100%;
+        height: auto;
+        min-height: 100vh;
+        padding: 36px 20px;
+        justify-content: flex-start;
+      }
+      .mobile-brand-banner {
+        display: flex;
+      }
+      .form-input {
+        font-size: 16px; /* Prevents iOS Safari auto-zoom on mobile */
+      }
+    }
+
+    @media (max-width: 480px) {
+      .auth-panel {
+        padding: 24px 14px;
+      }
+      .auth-panel-inner {
+        max-width: 100%;
+      }
+      .auth-header h2 {
+        font-size: 1.35rem;
+      }
+      .auth-tab {
+        padding: 10px 12px;
+        font-size: 0.875rem;
+      }
+      .btn-submit {
+        padding: 12px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-toast" id="login-toast">
+    <span id="toast-msg">Notification</span>
+  </div>
+
+  <div class="login-container">
+    <!-- LEFT PANEL: BRANDING -->
+    <div class="brand-panel">
+      <div class="grid-pattern"></div>
+      <div class="floating-cards">
+        <div class="float-card"></div>
+        <div class="float-card"></div>
+        <div class="float-card"></div>
+      </div>
+
+      <div class="brand-content">
+        <div class="brand-logo" style="background: #FFFFFF; border: 1.5px solid #DBEAFE; box-shadow: 0 8px 24px rgba(0,0,0,0.25); padding: 10px;">
+          <img src="assets/billcraft-logo.png" alt="BillCraft Logo" style="width: 100%; height: 100%; object-fit: contain;">
+        </div>
+        <h1 class="brand-heading">BillCraft <span class="highlight">Pro</span></h1>
+        <p class="brand-tagline">
+          Create stunning, professional invoices in minutes. Real-time preview, instant PDF export, and cloud history.
+        </p>
+        <ul class="feature-list">
+          <li>
+            <span class="feature-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></span>
+            Dual-panel editor with live document preview
+          </li>
+          <li>
+            <span class="feature-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></span>
+            One-click high-resolution PDF export
+          </li>
+          <li>
+            <span class="feature-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg></span>
+            Secure email authentication powered by Supabase
+          </li>
+          <li>
+            <span class="feature-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></span>
+            Persistent cloud invoice history linked to your account
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: AUTH -->
+    <div class="auth-panel">
+      <div class="auth-panel-inner">
+
+        <!-- MOBILE BRANDING BANNER (Visible on <= 900px) -->
+        <div class="mobile-brand-banner">
+          <div class="mobile-brand-logo" style="background: #EFF6FF; border: 1.5px solid #DBEAFE; padding: 4px;">
+            <img src="assets/billcraft-logo.png" alt="BillCraft Logo" style="width: 100%; height: 100%; object-fit: contain;">
+          </div>
+          <span class="mobile-brand-title">BillCraft <strong>PRO</strong></span>
+        </div>
+
+        <!-- STANDARD AUTH HEADER & TABS -->
+        <div id="auth-main-view">
+          <div class="auth-header">
+            <div class="welcome-text" id="welcome-label">Welcome back</div>
+            <h2 id="auth-title">Sign in to your account</h2>
+            <p id="auth-subtitle">Access your invoices, history, and billing tools.</p>
+          </div>
+
+          <!-- Notice container (e.g. for email not confirmed alert) -->
+          <div id="auth-notice-box" style="display: none;"></div>
+
+          <!-- Tabs -->
+          <div class="auth-tabs">
+            <button class="auth-tab active" id="tab-signin">Sign In</button>
+            <button class="auth-tab" id="tab-signup">Sign Up</button>
+          </div>
+
+          <!-- ============== SIGN IN FORM ============== -->
+          <form class="auth-form" id="form-signin" novalidate>
+            <div class="form-group">
+              <label class="form-label" for="signin-email">Email Address</label>
+              <input type="email" id="signin-email" class="form-input" placeholder="you@company.com" autocomplete="email" required>
+              <span class="form-error" id="signin-email-error">Please enter a valid email address</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="signin-password">Password</label>
+              <div class="password-wrapper">
+                <input type="password" id="signin-password" class="form-input" placeholder="Enter your password" autocomplete="current-password" required>
+                <button type="button" class="btn-toggle-pw" id="toggle-signin-pw" title="Show password">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </button>
+              </div>
+              <span class="form-error" id="signin-password-error">Please enter your password</span>
+            </div>
+
+            <span class="form-error" id="signin-general-error" style="text-align: center;"></span>
+
+            <button type="submit" class="btn-submit" id="btn-signin">
+              <div class="spinner"></div>
+              <span>Sign In</span>
+            </button>
+          </form>
+
+          <!-- ============== SIGN UP FORM ============== -->
+          <form class="auth-form" id="form-signup" style="display: none;" novalidate>
+            <div class="form-group">
+              <label class="form-label" for="signup-name">Full Name</label>
+              <input type="text" id="signup-name" class="form-input" placeholder="e.g. John Doe" autocomplete="name" required>
+              <span class="form-error" id="signup-name-error">Please enter your name</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="signup-email">Email Address</label>
+              <input type="email" id="signup-email" class="form-input" placeholder="you@company.com" autocomplete="email" required>
+              <span class="form-error" id="signup-email-error">Please enter a valid email address</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="signup-business">Business Name <span class="optional">(optional)</span></label>
+              <input type="text" id="signup-business" class="form-input" placeholder="e.g. Acme Studio Inc." autocomplete="organization">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="signup-password">Password</label>
+              <div class="password-wrapper">
+                <input type="password" id="signup-password" class="form-input" placeholder="Minimum 6 characters" autocomplete="new-password" required>
+                <button type="button" class="btn-toggle-pw" id="toggle-signup-pw" title="Show password">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </button>
+              </div>
+              <span class="form-error" id="signup-password-error">Password must be at least 6 characters</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="signup-confirm">Confirm Password</label>
+              <div class="password-wrapper">
+                <input type="password" id="signup-confirm" class="form-input" placeholder="Re-enter your password" autocomplete="new-password" required>
+                <button type="button" class="btn-toggle-pw" id="toggle-signup-confirm" title="Show password">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </button>
+              </div>
+              <span class="form-error" id="signup-confirm-error">Passwords do not match</span>
+            </div>
+
+            <span class="form-error" id="signup-general-error" style="text-align: center;"></span>
+
+            <button type="submit" class="btn-submit" id="btn-signup">
+              <div class="spinner"></div>
+              <span>Create Account</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- ============== EMAIL VERIFICATION VIEW ============== -->
+        <div class="verify-view" id="verify-view" style="display: none;">
+          <div class="verify-icon-wrapper">
+            <div class="verify-pulse"></div>
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+          </div>
+
+          <h3 class="verify-title">Verify Your Email</h3>
+          <p class="verify-desc">
+            A confirmation email has been sent to:
+          </p>
+          <div class="verify-email-badge">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            <span id="verify-email-display">user@example.com</span>
+          </div>
+
+          <!-- Live Status Indicator -->
+          <div class="verify-live-status">
+            <span class="pulse-status-dot"></span>
+            <span>Waiting for confirmation via email link...</span>
+          </div>
+
+          <!-- Instructions Card -->
+          <div class="verify-instructions-card">
+            <div class="verify-step-item">
+              <span class="step-num">1</span>
+              <span>Open the confirmation email sent to your inbox.</span>
+            </div>
+            <div class="verify-step-item">
+              <span class="step-num">2</span>
+              <span>Click the <strong>Confirm your email</strong> link in the message.</span>
+            </div>
+            <div class="verify-step-item">
+              <span class="step-num">3</span>
+              <span>This window will automatically detect your confirmation and log you in.</span>
+            </div>
+          </div>
+
+          <!-- Rate limit / verification notice box -->
+          <div id="verify-notice-box" style="width: 100%; display: none; margin-top: 4px; margin-bottom: 14px;"></div>
+
+          <!-- Actions Area -->
+          <div class="verify-actions">
+            <button type="button" class="btn-resend-primary" id="btn-resend-email">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              <span>Resend verification email</span>
+            </button>
+            <div class="resend-timer-badge" id="resend-timer" style="display: none;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <span>Resend available in <strong id="resend-countdown">60</strong>s</span>
+            </div>
+
+            <div class="verify-nav-links">
+              <button type="button" class="btn-link text-muted" id="btn-back-to-signup">Change Email</button>
+              <span class="nav-sep">•</span>
+              <button type="button" class="btn-link text-muted" id="btn-back-to-signin">Back to Sign In</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Supabase Project Connection Status (Hidden) -->
+        <div style="margin-top: 20px; text-align: center; display: none;">
+          <button type="button" id="btn-open-supabase-modal" class="btn-link" style="font-size: 0.75rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 6px; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: background 0.15s;">
+            <span id="supabase-status-indicator" style="width: 7px; height: 7px; border-radius: 50%; background: #94A3B8; display: inline-block;"></span>
+            <span>Supabase: <strong id="supabase-status-label">Checking...</strong></span>
+            <span style="text-decoration: underline; color: var(--secondary); margin-left: 2px;">Configure</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase Settings Modal -->
+  <div id="modal-supabase-config" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); z-index: 10000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px);">
+    <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); max-width: 480px; width: 100%; padding: 24px; box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--primary); margin: 0;">Configure Supabase Connection</h3>
+        <button type="button" id="btn-close-supabase-modal" class="btn-link" style="font-size: 1.35rem; cursor: pointer; color: var(--text-muted); line-height: 1;">&times;</button>
+      </div>
+      <p style="font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.45;">
+        Connect your Supabase project for real email confirmations, user accounts, and cloud storage. Obtain your credentials from <strong>Supabase Dashboard &rarr; Project Settings &rarr; API</strong>.
+      </p>
+      <div class="form-group" style="margin-bottom: 12px; text-align: left;">
+        <label class="form-label" for="cfg-supabase-url">Project URL</label>
+        <input type="url" id="cfg-supabase-url" class="form-input" placeholder="https://xyzcompany.supabase.co">
+      </div>
+      <div class="form-group" style="margin-bottom: 16px; text-align: left;">
+        <label class="form-label" for="cfg-supabase-key">Publishable / Anon API Key</label>
+        <input type="text" id="cfg-supabase-key" class="form-input" placeholder="sb_publishable_... or anon key">
+      </div>
+      <div id="cfg-test-status" style="display: none; padding: 10px 14px; border-radius: 6px; font-size: 0.8125rem; margin-bottom: 16px; text-align: left;"></div>
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button type="button" id="btn-test-supabase" class="btn btn-outline btn-sm">Test Connection</button>
+        <button type="button" id="btn-save-supabase" class="btn btn-primary btn-sm">Save & Connect</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase JS SDK (Local Vendor + CDN Fallback) -->
+  <script src="js/vendor/supabase.js"></script>
+  <script>
+    if (typeof supabase === 'undefined' && !window.supabase) {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"><\/script>');
+    }
+  </script>
+  <!-- Supabase Client Config -->
+  <script src="js/supabase-client.js"></script>
+  <!-- Auth Service Bridge -->
+  <script src="js/auth.js"></script>
+
+  <script>
+    (() => {
+      'use strict';
+
+      // ================================================================
+      // DOM REFS
+      // ================================================================
+      const authMainView = document.getElementById('auth-main-view');
+      const verifyView = document.getElementById('verify-view');
+
+      const tabSignIn = document.getElementById('tab-signin');
+      const tabSignUp = document.getElementById('tab-signup');
+      const formSignIn = document.getElementById('form-signin');
+      const formSignUp = document.getElementById('form-signup');
+
+      const welcomeLabel = document.getElementById('welcome-label');
+      const authTitle = document.getElementById('auth-title');
+      const authSubtitle = document.getElementById('auth-subtitle');
+      const authNoticeBox = document.getElementById('auth-notice-box');
+
+      const toast = document.getElementById('login-toast');
+      const toastMsg = document.getElementById('toast-msg');
+
+      // Sign In elements
+      const siEmail = document.getElementById('signin-email');
+      const siPassword = document.getElementById('signin-password');
+      const siEmailErr = document.getElementById('signin-email-error');
+      const siPwErr = document.getElementById('signin-password-error');
+      const siGeneralErr = document.getElementById('signin-general-error');
+      const btnSignIn = document.getElementById('btn-signin');
+
+      // Sign Up elements
+      const suName = document.getElementById('signup-name');
+      const suEmail = document.getElementById('signup-email');
+      const suBusiness = document.getElementById('signup-business');
+      const suPassword = document.getElementById('signup-password');
+      const suConfirm = document.getElementById('signup-confirm');
+      const suNameErr = document.getElementById('signup-name-error');
+      const suEmailErr = document.getElementById('signup-email-error');
+      const suPwErr = document.getElementById('signup-password-error');
+      const suConfirmErr = document.getElementById('signup-confirm-error');
+      const suGeneralErr = document.getElementById('signup-general-error');
+      const btnSignUp = document.getElementById('btn-signup');
+
+      // Verification elements
+      const verifyEmailDisplay = document.getElementById('verify-email-display');
+      const verifyNoticeBox = document.getElementById('verify-notice-box');
+      const btnResendEmail = document.getElementById('btn-resend-email');
+      const resendTimer = document.getElementById('resend-timer');
+      const resendCountdown = document.getElementById('resend-countdown');
+      const btnBackToSignup = document.getElementById('btn-back-to-signup');
+      const btnBackToSignin = document.getElementById('btn-back-to-signin');
+
+      // Supabase Modal elements
+      const btnOpenSupabaseModal = document.getElementById('btn-open-supabase-modal');
+      const btnCloseSupabaseModal = document.getElementById('btn-close-supabase-modal');
+      const modalSupabaseConfig = document.getElementById('modal-supabase-config');
+      const cfgSupabaseUrl = document.getElementById('cfg-supabase-url');
+      const cfgSupabaseKey = document.getElementById('cfg-supabase-key');
+      const cfgTestStatus = document.getElementById('cfg-test-status');
+      const btnTestSupabase = document.getElementById('btn-test-supabase');
+      const btnSaveSupabase = document.getElementById('btn-save-supabase');
+      const supabaseStatusIndicator = document.getElementById('supabase-status-indicator');
+      const supabaseStatusLabel = document.getElementById('supabase-status-label');
+
+      let pendingVerificationEmail = '';
+      let resendCooldownInterval = null;
+      let verifyPollingInterval = null;
+
+      // ================================================================
+      // HELPERS
+      // ================================================================
+      const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+      const showToast = (msg, type = 'success') => {
+        toastMsg.textContent = msg;
+        toast.className = `login-toast ${type} show`;
+        setTimeout(() => toast.classList.remove('show'), 4000);
+      };
+
+      const setButtonLoading = (btn, isLoading) => {
+        if (!btn) return;
+        if (isLoading) {
+          btn.classList.add('loading');
+          btn.disabled = true;
+        } else {
+          btn.classList.remove('loading');
+          btn.disabled = false;
+        }
+      };
+
+      const showError = (input, errorEl, msg) => {
+        if (input) input.classList.add('error');
+        if (errorEl) {
+          if (msg) errorEl.textContent = msg;
+          errorEl.classList.add('visible');
+        }
+      };
+
+      const clearAllErrors = () => {
+        [siEmail, siPassword, suName, suEmail, suPassword, suConfirm].forEach(el => {
+          if (el) el.classList.remove('error');
+        });
+        [siEmailErr, siPwErr, siGeneralErr, suNameErr, suEmailErr, suPwErr, suConfirmErr, suGeneralErr].forEach(el => {
+          if (el) {
+            el.classList.remove('visible');
+            el.textContent = '';
+          }
+        });
+        authNoticeBox.style.display = 'none';
+        authNoticeBox.innerHTML = '';
+      };
+
+      // Helper for smooth page transitions to workspace
+      const smoothNavigate = (url, replace = false) => {
+        document.body.classList.add('page-exit');
+        setTimeout(() => {
+          if (replace) {
+            window.location.replace(url);
+          } else {
+            window.location.href = url;
+          }
+        }, 130);
+      };
+
+      // ================================================================
+      // TAB SWITCHING (ANIMATED & GPU ACCELERATED)
+      // ================================================================
+      const switchTab = (tab) => {
+        clearAllErrors();
+        authMainView.style.display = 'block';
+        authMainView.classList.add('view-fade-in');
+        verifyView.style.display = 'none';
+        verifyView.classList.remove('view-fade-in');
+
+        const isSignIn = tab === 'signin';
+        tabSignIn.classList.toggle('active', isSignIn);
+        tabSignUp.classList.toggle('active', !isSignIn);
+
+        const currentForm = isSignIn ? formSignUp : formSignIn;
+        const targetForm = isSignIn ? formSignIn : formSignUp;
+
+        welcomeLabel.textContent = isSignIn ? 'Welcome back' : 'Get started';
+        authTitle.textContent = isSignIn ? 'Sign in to your account' : 'Create your account';
+        authSubtitle.textContent = isSignIn ? 'Access your invoices, history, and billing tools.' : 'Sign up with email to start creating invoices.';
+
+        currentForm.style.display = 'none';
+        currentForm.classList.remove('form-fade-in');
+
+        targetForm.style.display = 'flex';
+        targetForm.classList.remove('form-fade-in');
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            targetForm.classList.add('form-fade-in');
+          });
+        });
+      };
+
+      tabSignIn.addEventListener('click', () => switchTab('signin'));
+      tabSignUp.addEventListener('click', () => switchTab('signup'));
+
+      // ================================================================
+      // PASSWORD VISIBILITY TOGGLE
+      // ================================================================
+      const setupPwToggle = (btnId, inputId) => {
+        const btn = document.getElementById(btnId);
+        const input = document.getElementById(inputId);
+        if (!btn || !input) return;
+        btn.addEventListener('click', () => {
+          const isPassword = input.type === 'password';
+          input.type = isPassword ? 'text' : 'password';
+          btn.title = isPassword ? 'Hide password' : 'Show password';
+        });
+      };
+
+      setupPwToggle('toggle-signin-pw', 'signin-password');
+      setupPwToggle('toggle-signup-pw', 'signup-password');
+      setupPwToggle('toggle-signup-confirm', 'signup-confirm');
+
+      // Clear field errors on input
+      [siEmail, siPassword].forEach(el => el.addEventListener('input', () => {
+        el.classList.remove('error');
+        siEmailErr.classList.remove('visible');
+        siPwErr.classList.remove('visible');
+        siGeneralErr.classList.remove('visible');
+      }));
+
+      [suName, suEmail, suPassword, suConfirm].forEach(el => el.addEventListener('input', () => {
+        el.classList.remove('error');
+        suNameErr.classList.remove('visible');
+        suEmailErr.classList.remove('visible');
+        suPwErr.classList.remove('visible');
+        suConfirmErr.classList.remove('visible');
+        suGeneralErr.classList.remove('visible');
+      }));
+
+      // ================================================================
+      // VERIFICATION SCREEN HANDLING (EMAIL LINK CONFIRMATION)
+      // ================================================================
+      const showVerificationView = (email, isRateLimit = false) => {
+        pendingVerificationEmail = email;
+        verifyEmailDisplay.textContent = email;
+
+        authMainView.style.display = 'none';
+        authMainView.classList.remove('view-fade-in');
+
+        verifyView.style.display = 'flex';
+        verifyView.classList.remove('view-fade-in');
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            verifyView.classList.add('view-fade-in');
+          });
+        });
+
+        if (verifyNoticeBox) {
+          if (isRateLimit) {
+            verifyNoticeBox.className = 'auth-notice warning';
+            verifyNoticeBox.innerHTML = `
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              <div>
+                <strong>Limit Exceeded:</strong> Supabase email authentication limit is exceeded. Please try again later.
+              </div>
+            `;
+            verifyNoticeBox.style.display = 'flex';
+          } else {
+            verifyNoticeBox.style.display = 'none';
+          }
+        }
+
+        startResendTimer(60);
+
+        // Start active polling to detect when the user confirms their email via link
+        clearInterval(verifyPollingInterval);
+        verifyPollingInterval = setInterval(async () => {
+          if (!pendingVerificationEmail) return;
+          try {
+            const res = await window.BillCraftAuth.checkEmailVerified(pendingVerificationEmail);
+            if (res && res.verified) {
+              clearInterval(verifyPollingInterval);
+              clearInterval(resendCooldownInterval);
+              showToast('Email verified successfully! Logging you in...', 'success');
+              setTimeout(() => {
+                triggerRedirect(res.user ? res.user.name : '');
+              }, 700);
+            }
+          } catch (e) {
+            // Silently wait for next polling tick
+          }
+        }, 3500);
+      };
+
+      const startResendTimer = (seconds = 60) => {
+        clearInterval(resendCooldownInterval);
+        btnResendEmail.style.display = 'none';
+        resendTimer.style.display = 'inline-flex';
+        resendCountdown.textContent = seconds;
+
+        let remaining = seconds;
+        resendCooldownInterval = setInterval(() => {
+          remaining -= 1;
+          resendCountdown.textContent = remaining;
+          if (remaining <= 0) {
+            clearInterval(resendCooldownInterval);
+            resendTimer.style.display = 'none';
+            btnResendEmail.style.display = 'inline-flex';
+            btnResendEmail.disabled = false;
+            btnResendEmail.innerHTML = `
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              <span>Resend verification email</span>
+            `;
+          }
+        }, 1000);
+      };
+
+      btnBackToSignup.addEventListener('click', () => {
+        clearInterval(resendCooldownInterval);
+        clearInterval(verifyPollingInterval);
+        switchTab('signup');
+        if (pendingVerificationEmail) suEmail.value = pendingVerificationEmail;
+      });
+
+      if (btnBackToSignin) {
+        btnBackToSignin.addEventListener('click', () => {
+          clearInterval(resendCooldownInterval);
+          clearInterval(verifyPollingInterval);
+          switchTab('signin');
+          if (pendingVerificationEmail) siEmail.value = pendingVerificationEmail;
+        });
+      }
+
+      btnResendEmail.addEventListener('click', async () => {
+        if (!pendingVerificationEmail) return;
+        btnResendEmail.disabled = true;
+        const origContent = btnResendEmail.innerHTML;
+        btnResendEmail.innerHTML = `
+          <div class="spinner" style="display: inline-block; width: 14px; height: 14px; border-width: 2px; border-top-color: var(--secondary);"></div>
+          <span>Sending verification email...</span>
+        `;
+
+        try {
+          const res = await window.BillCraftAuth.resendVerification(pendingVerificationEmail);
+          if (res.success) {
+            showToast('Verification email resent! Please check your inbox.', 'info');
+            startResendTimer(60);
+            if (verifyNoticeBox) verifyNoticeBox.style.display = 'none';
+          } else {
+            const isLimit = res.isRateLimit || (res.error && res.error.toLowerCase().includes('limit'));
+            const limitMsg = 'Supabase email authentication limit is exceeded. Please try again later.';
+            showToast(isLimit ? limitMsg : (res.error || 'Failed to resend verification email'), 'error');
+            if (verifyNoticeBox && isLimit) {
+              verifyNoticeBox.className = 'auth-notice warning';
+              verifyNoticeBox.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <div>
+                  <strong>Limit Exceeded:</strong> ${limitMsg}
+                </div>
+              `;
+              verifyNoticeBox.style.display = 'flex';
+            }
+            btnResendEmail.disabled = false;
+            btnResendEmail.innerHTML = origContent;
+          }
+        } catch (e) {
+          showToast('Failed to resend email. Please try again later.', 'error');
+          btnResendEmail.disabled = false;
+          btnResendEmail.innerHTML = origContent;
+        }
+      });
+
+      // ================================================================
+      // FORM SUBMISSIONS: SIGN IN
+      // ================================================================
+      formSignIn.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearAllErrors();
+
+        const email = siEmail.value.trim().toLowerCase();
+        const password = siPassword.value;
+
+        let valid = true;
+        if (!email || !isValidEmail(email)) {
+          showError(siEmail, siEmailErr, 'Please enter a valid email address');
+          valid = false;
+        }
+        if (!password) {
+          showError(siPassword, siPwErr, 'Please enter your password');
+          valid = false;
+        }
+
+        if (!valid) return;
+
+        setButtonLoading(btnSignIn, true);
+
+        try {
+          const res = await window.BillCraftAuth.signIn(email, password);
+
+          if (res.success) {
+            showToast(`Welcome back, ${res.user ? res.user.name : ''}!`);
+            setTimeout(() => { smoothNavigate('index.html'); }, 500);
+            return;
+          }
+
+          if (res.isEmailNotConfirmed) {
+            authNoticeBox.className = 'auth-notice warning';
+            authNoticeBox.innerHTML = `
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+              <div>
+                <strong>Email verification required:</strong> ${res.error || 'Please verify your email address.'}
+                <br><button type="button" class="btn-link" id="btn-notice-verify-now" style="font-weight: 600; text-decoration: underline; margin-top: 4px; display: inline-block;">Verify Email Now &rarr;</button>
+              </div>
+            `;
+            authNoticeBox.style.display = 'flex';
+            const btnNoticeVerify = document.getElementById('btn-notice-verify-now');
+            if (btnNoticeVerify) {
+              btnNoticeVerify.addEventListener('click', () => {
+                showVerificationView(email);
+              });
+            }
+          }
+
+          showError(null, siGeneralErr, res.error || 'Invalid email or password.');
+        } catch (err) {
+          showError(null, siGeneralErr, err.message || 'Error signing in. Please check your connection.');
+        } finally {
+          setButtonLoading(btnSignIn, false);
+        }
+      });
+
+      // ================================================================
+      // FORM SUBMISSIONS: SIGN UP
+      // ================================================================
+      formSignUp.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearAllErrors();
+
+        const name = suName.value.trim();
+        const email = suEmail.value.trim().toLowerCase();
+        const business = suBusiness.value.trim();
+        const password = suPassword.value;
+        const confirm = suConfirm.value;
+
+        let valid = true;
+        if (!name) { showError(suName, suNameErr, 'Please enter your full name'); valid = false; }
+        if (!email || !isValidEmail(email)) { showError(suEmail, suEmailErr, 'Please enter a valid email address'); valid = false; }
+        if (!password || password.length < 6) { showError(suPassword, suPwErr, 'Password must be at least 6 characters'); valid = false; }
+        if (password !== confirm) { showError(suConfirm, suConfirmErr, 'Passwords do not match'); valid = false; }
+
+        if (!valid) return;
+
+        setButtonLoading(btnSignUp, true);
+
+        try {
+          const res = await window.BillCraftAuth.signUp(email, password, {
+            name: name,
+            businessName: business
+          });
+
+          if (!res.success) {
+            if (res.isAlreadyRegistered) {
+              authNoticeBox.className = 'auth-notice info';
+              authNoticeBox.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                <div>
+                  <strong>Account already registered.</strong> This email is already registered.
+                  <button type="button" class="btn-link" id="btn-quick-signin" style="font-weight: 600; text-decoration: underline; margin-left: 6px;">Sign In Now</button>
+                </div>
+              `;
+              authNoticeBox.style.display = 'flex';
+              const btnQuick = document.getElementById('btn-quick-signin');
+              if (btnQuick) {
+                btnQuick.addEventListener('click', () => {
+                  switchTab('signin');
+                  siEmail.value = email;
+                  siPassword.focus();
+                });
+              }
+            } else if (res.isConnectionError) {
+              authNoticeBox.className = 'auth-notice warning';
+              authNoticeBox.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                <div style="font-size: 0.8125rem;">
+                  <strong>Cannot send verification email:</strong> ${res.error}
+                  <br><button type="button" class="btn-link" id="btn-notice-open-config" style="font-weight: 600; text-decoration: underline; margin-top: 4px; display: inline-block;">Configure Supabase Project Settings &rarr;</button>
+                </div>
+              `;
+              authNoticeBox.style.display = 'flex';
+              const btnOpenCfg = document.getElementById('btn-notice-open-config');
+              if (btnOpenCfg && btnOpenSupabaseModal) {
+                btnOpenCfg.addEventListener('click', () => btnOpenSupabaseModal.click());
+              }
+              showError(null, suGeneralErr, res.error);
+            } else if (res.isRateLimit) {
+              authNoticeBox.style.display = 'none';
+              showError(null, suGeneralErr, 'Too many requests. Please wait a moment before trying again.');
+            } else {
+              showError(null, suGeneralErr, res.error || 'Unable to create account. Please try again.');
+            }
+            setButtonLoading(btnSignUp, false);
+            return;
+          }
+
+          if (res.needsEmailConfirmation) {
+            // Show verification screen instructing user to confirm via email link
+            if (res.isRateLimit) {
+              showToast('Supabase email limit exceeded. Please try again later.', 'warning');
+            } else {
+              showToast('Account registered! Please verify your email.', 'info');
+            }
+            showVerificationView(email, Boolean(res.isRateLimit));
+          } else {
+            // Auto-signed in
+            showToast(`Account created! Welcome, ${name}!`);
+            setTimeout(() => { smoothNavigate('index.html'); }, 500);
+          }
+        } catch (err) {
+          showError(null, suGeneralErr, err.message || 'Signup failed. Please try again.');
+        } finally {
+          setButtonLoading(btnSignUp, false);
+        }
+      });
+
+
+
+
+
+      // ================================================================
+      // REAL-TIME AUTH LISTENER & CROSS-TAB SYNC
+      // ================================================================
+      const isLoggingOut = () => {
+        const p = new URLSearchParams(window.location.search);
+        return p.get('logout') === 'true' || p.get('action') === 'signout' || p.get('deleted') === 'true';
+      };
+
+      let hasRedirected = false;
+      const triggerRedirect = (name = '') => {
+        if (hasRedirected || isLoggingOut()) return;
+        hasRedirected = true;
+        showToast(`Welcome to BillCraft Pro${name ? ', ' + name : ''}! Redirecting...`, 'success');
+        setTimeout(() => {
+          smoothNavigate('index.html');
+        }, 600);
+      };
+
+      // Listen for auth state changes (e.g. email verified in another tab or background)
+      window.BillCraftAuth.onAuthStateChanged((user) => {
+        if (isLoggingOut()) return;
+        if (user && user.email) {
+          triggerRedirect(user.name);
+        }
+      });
+
+      // Listen for cross-tab session changes
+      window.addEventListener('storage', (e) => {
+        if (isLoggingOut()) return;
+        if (e.key === 'billcraft_user' && e.newValue) {
+          try {
+            const u = JSON.parse(e.newValue);
+            if (u && u.email) {
+              triggerRedirect(u.name);
+            }
+          } catch {}
+        }
+      });
+
+      // ================================================================
+      // SUPABASE CONFIGURATION MODAL & CONNECTION STATUS
+      // ================================================================
+      const updateSupabaseStatus = async () => {
+        if (!supabaseStatusIndicator || !supabaseStatusLabel) return;
+        supabaseStatusIndicator.style.background = '#F59E0B';
+        supabaseStatusLabel.textContent = 'Checking connection...';
+
+        try {
+          const res = await window.BillCraftDB.testConnection();
+          if (res.connected) {
+            supabaseStatusIndicator.style.background = '#10B981';
+            supabaseStatusLabel.textContent = 'Supabase Connected';
+          } else {
+            supabaseStatusIndicator.style.background = '#EF4444';
+            supabaseStatusLabel.textContent = 'Supabase Offline (Demo Mode)';
+          }
+        } catch (e) {
+          supabaseStatusIndicator.style.background = '#EF4444';
+          supabaseStatusLabel.textContent = 'Supabase Offline';
+        }
+      };
+
+      if (btnOpenSupabaseModal && modalSupabaseConfig) {
+        btnOpenSupabaseModal.addEventListener('click', () => {
+          if (cfgSupabaseUrl && window.BillCraftDB?.config) {
+            cfgSupabaseUrl.value = window.BillCraftDB.config.url || '';
+          }
+          if (cfgSupabaseKey && window.BillCraftDB?.config) {
+            cfgSupabaseKey.value = window.BillCraftDB.config.anonKey || '';
+          }
+          if (cfgTestStatus) {
+            cfgTestStatus.style.display = 'none';
+            cfgTestStatus.textContent = '';
+          }
+          modalSupabaseConfig.style.display = 'flex';
+        });
+
+        if (btnCloseSupabaseModal) {
+          btnCloseSupabaseModal.addEventListener('click', () => {
+            modalSupabaseConfig.style.display = 'none';
+          });
+        }
+
+        modalSupabaseConfig.addEventListener('click', (e) => {
+          if (e.target === modalSupabaseConfig) {
+            modalSupabaseConfig.style.display = 'none';
+          }
+        });
+      }
+
+      if (btnTestSupabase) {
+        btnTestSupabase.addEventListener('click', async () => {
+          const url = cfgSupabaseUrl ? cfgSupabaseUrl.value.trim() : '';
+          const key = cfgSupabaseKey ? cfgSupabaseKey.value.trim() : '';
+
+          if (!url || !key) {
+            if (cfgTestStatus) {
+              cfgTestStatus.style.display = 'block';
+              cfgTestStatus.style.color = '#DC2626';
+              cfgTestStatus.textContent = 'Please provide both Project URL and Anon Key.';
+            }
+            return;
+          }
+
+          setButtonLoading(btnTestSupabase, true);
+          if (cfgTestStatus) {
+            cfgTestStatus.style.display = 'block';
+            cfgTestStatus.style.color = '#64748B';
+            cfgTestStatus.textContent = 'Testing connection to Supabase...';
+          }
+
+          try {
+            const res = await window.BillCraftDB.testConnection(url, key);
+            if (res.connected) {
+              cfgTestStatus.style.color = '#059669';
+              cfgTestStatus.textContent = 'Connection verified successfully! Project is reachable.';
+            } else {
+              cfgTestStatus.style.color = '#DC2626';
+              cfgTestStatus.textContent = `Connection failed: ${res.error || 'Host unreachable'}`;
+            }
+          } catch (e) {
+            cfgTestStatus.style.color = '#DC2626';
+            cfgTestStatus.textContent = `Error: ${e.message}`;
+          } finally {
+            setButtonLoading(btnTestSupabase, false);
+          }
+        });
+      }
+
+      if (btnSaveSupabase) {
+        btnSaveSupabase.addEventListener('click', async () => {
+          const url = cfgSupabaseUrl ? cfgSupabaseUrl.value.trim() : '';
+          const key = cfgSupabaseKey ? cfgSupabaseKey.value.trim() : '';
+
+          if (!url || !key) {
+            showToast('Please enter both Supabase Project URL and Anon Key', 'error');
+            return;
+          }
+
+          setButtonLoading(btnSaveSupabase, true);
+          try {
+            const success = window.BillCraftDB.setCredentials(url, key);
+            if (success) {
+              showToast('Supabase credentials saved successfully!', 'success');
+              await updateSupabaseStatus();
+              setTimeout(() => {
+                if (modalSupabaseConfig) modalSupabaseConfig.style.display = 'none';
+              }, 400);
+            } else {
+              showToast('Failed to initialize Supabase with those credentials.', 'error');
+            }
+          } catch (err) {
+            showToast(`Save failed: ${err.message}`, 'error');
+          } finally {
+            setButtonLoading(btnSaveSupabase, false);
+          }
+        });
+      }
+
+      // Initial check of Supabase connectivity
+      updateSupabaseStatus();
+
+      // ================================================================
+      // AUTO-REDIRECT IF SIGNED IN / PROCESS EMAIL LINK REDIRECT
+      // ================================================================
+      const checkCurrentSession = async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // Check if user came from an explicit sign out
+        if (urlParams.get('logout') === 'true' || urlParams.get('action') === 'signout') {
+          if (window.BillCraftAuth) {
+            await window.BillCraftAuth.signOut();
+          }
+          showToast('You have been signed out successfully.', 'info');
+          return; // Strictly stop here! Do not auto-redirect!
+        }
+
+        // Check if user came from an explicit account deletion
+        if (urlParams.get('deleted') === 'true') {
+          if (window.BillCraftAuth) {
+            await window.BillCraftAuth.signOut();
+          }
+          showToast('Your account and all invoices have been permanently deleted.', 'info');
+          return; // Strictly stop here! Do not auto-redirect!
+        }
+
+        await window.BillCraftAuth.whenReady();
+
+        const hash = window.location.hash || '';
+
+        // Check if there was an error in URL from Supabase mailer
+        const errorDesc = urlParams.get('error_description') || urlParams.get('error');
+        if (errorDesc) {
+          showToast(decodeURIComponent(errorDesc), 'error');
+          authNoticeBox.className = 'auth-notice error';
+          authNoticeBox.innerHTML = `<div><strong>Verification Issue:</strong> ${decodeURIComponent(errorDesc)}</div>`;
+          authNoticeBox.style.display = 'flex';
+          return;
+        }
+
+        // 1. Handle token_hash from Supabase confirmation email (email verification link)
+        const tokenHash = urlParams.get('token_hash');
+        const otpType = urlParams.get('type') || 'signup';
+        if (tokenHash) {
+          showToast('Verifying email link...', 'info');
+          try {
+            const client = window.BillCraftDB?.client;
+            if (client && client.auth && client.auth.verifyOtp) {
+              const { data, error } = await client.auth.verifyOtp({ token_hash: tokenHash, type: otpType });
+              if (!error && data?.session) {
+                showToast('Email verified! Directing to workspace...', 'success');
+                triggerRedirect(data.user?.user_metadata?.full_name || data.user?.email);
+                return;
+              } else if (error) {
+                authNoticeBox.className = 'auth-notice warning';
+                authNoticeBox.innerHTML = `<div><strong>Verification link error:</strong> ${error.message}</div>`;
+                authNoticeBox.style.display = 'flex';
+              }
+            }
+          } catch (e) {
+            console.warn('Verify token_hash error:', e);
+          }
+        }
+
+        // 2. Handle PKCE code exchange from email link
+        const authCode = urlParams.get('code');
+        if (authCode) {
+          showToast('Exchanging verification code...', 'info');
+          try {
+            const client = window.BillCraftDB?.client;
+            if (client && client.auth && client.auth.exchangeCodeForSession) {
+              const { data, error } = await client.auth.exchangeCodeForSession(authCode);
+              if (!error && data?.session) {
+                showToast('Email verified! Directing to workspace...', 'success');
+                triggerRedirect(data.user?.user_metadata?.full_name || data.user?.email);
+                return;
+              } else if (error) {
+                authNoticeBox.className = 'auth-notice warning';
+                authNoticeBox.innerHTML = `<div><strong>Verification code error:</strong> ${error.message}</div>`;
+                authNoticeBox.style.display = 'flex';
+              }
+            }
+          } catch (e) {
+            console.warn('Exchange code error:', e);
+          }
+        }
+
+        // 3. Handle implicit hash (#access_token=...)
+        if (hash.includes('access_token') || hash.includes('type=signup') || hash.includes('type=recovery')) {
+          showToast('Email confirmation detected! Logging you in...', 'success');
+          setTimeout(async () => {
+            const current = window.BillCraftAuth.getCurrentUser();
+            if (current && current.email) {
+              triggerRedirect(current.name);
+            }
+          }, 800);
+          return;
+        }
+
+        // 4. If already authenticated with active session, redirect to app
+        if (window.BillCraftAuth.isSignedIn()) {
+          const user = window.BillCraftAuth.getCurrentUser();
+          if (user && user.email) {
+            smoothNavigate('index.html', true);
+          }
+        }
+      };
+
+      checkCurrentSession();
+    })();
+  </script>
+
+</body>
+</html>

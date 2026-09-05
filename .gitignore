@@ -1,0 +1,16 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE & Editor Configs
+.vscode/
+.idea/
+*.swp
+
+# Agent & AI local configurations
+.agents/
+
+# Logs & Temp
+*.log
+npm-debug.log*
