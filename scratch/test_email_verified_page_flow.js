@@ -57,6 +57,15 @@ console.log('\nStep 4: Checking js/app.js token forwarding');
 const appSource = fs.readFileSync(path.join(__dirname, '../js/app.js'), 'utf8');
 assert(appSource.includes("window.location.replace('verified.html'"), 'js/app.js forwards incoming confirmation tokens to verified.html');
 
+// 5. Verify vercel.json routing for /verified and cleanUrls
+console.log('\nStep 5: Checking vercel.json configuration');
+const vercelConfigPath = path.join(__dirname, '../vercel.json');
+assert(fs.existsSync(vercelConfigPath), 'vercel.json file exists');
+const vercelConfig = JSON.parse(fs.readFileSync(vercelConfigPath, 'utf8'));
+assert(vercelConfig.cleanUrls === true, 'vercel.json has cleanUrls enabled');
+assert(Array.isArray(vercelConfig.rewrites) && vercelConfig.rewrites.some(r => r.source === '/verified'), 'vercel.json has rewrite for /verified');
+assert(Array.isArray(vercelConfig.rewrites) && vercelConfig.rewrites.some(r => r.source === '/login'), 'vercel.json has rewrite for /login');
+
 console.log('\n===============================================================');
 console.log(`SUMMARY: ${passed} Passed, ${failed} Failed.`);
 console.log('===============================================================');

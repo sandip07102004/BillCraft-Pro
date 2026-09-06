@@ -665,27 +665,33 @@
       const initVerification = async () => {
         const urlParams = new URLSearchParams(window.location.search);
         const hash = window.location.hash || '';
+        const hashClean = hash.replace(/^#\/?/, '');
+        const hashParams = new URLSearchParams(hashClean);
 
-        // 1. Check for error in query or hash
-        const errorDesc = urlParams.get('error_description') || urlParams.get('error');
-        if (errorDesc) {
-          errorMessageText.textContent = decodeURIComponent(errorDesc);
+        // Helper to retrieve param from either query search or URL hash fragment
+        const getParam = (name) => urlParams.get(name) || hashParams.get(name);
+
+        // 1. Check for error in query or hash (e.g. otp_expired, access_denied, invalid token)
+        const rawErrorDesc = getParam('error_description') || getParam('error');
+        if (rawErrorDesc) {
+          const formattedError = decodeURIComponent(rawErrorDesc.replace(/\+/g, ' '));
+          errorMessageText.textContent = formattedError;
           showView('error');
           return;
         }
 
         // Check for email passed directly
-        const paramEmail = urlParams.get('email');
+        const paramEmail = getParam('email');
         if (paramEmail) {
           setVerifiedEmail(paramEmail);
           markLocalAccountVerified(paramEmail);
         }
 
         // Check if there are token or code parameters that need processing
-        const tokenHash = urlParams.get('token_hash');
-        const otpType = urlParams.get('type') || 'signup';
-        const authCode = urlParams.get('code');
-        const hasHashToken = hash.includes('access_token');
+        const tokenHash = getParam('token_hash') || getParam('token');
+        const otpType = getParam('type') || 'signup';
+        const authCode = getParam('code');
+        const hasHashToken = hashClean.includes('access_token') || urlParams.has('access_token');
 
         if (tokenHash || authCode || hasHashToken) {
           showView('loading');
@@ -727,11 +733,10 @@
               verifiedUserEmail = data.user.email;
             }
           }
-          // Process implicit access_token in hash
+          // Process implicit access_token in hash or query
           else if (hasHashToken) {
             loadingMsg.textContent = 'Confirming account authentication...';
-            const hashParams = new URLSearchParams(hash.replace(/^#/, ''));
-            const accessToken = hashParams.get('access_token');
+            const accessToken = getParam('access_token');
             if (accessToken) {
               const payload = parseJwtPayload(accessToken);
               if (payload?.email) {

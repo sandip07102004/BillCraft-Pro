@@ -1723,21 +1723,26 @@
           return; // Stop here! User must sign in!
         }
 
+        const hashClean = hash.replace(/^#\/?/, '');
+        const hashParams = new URLSearchParams(hashClean);
+        const getParam = (name) => urlParams.get(name) || hashParams.get(name);
+
         // If incoming confirmation link was directed to login.html, forward to verified.html
-        const tokenHash = urlParams.get('token_hash');
-        const authCode = urlParams.get('code');
-        const isSignupConfirm = (urlParams.get('type') === 'signup') || hash.includes('type=signup') || tokenHash || authCode;
+        const tokenHash = getParam('token_hash') || getParam('token');
+        const authCode = getParam('code');
+        const isSignupConfirm = (getParam('type') === 'signup') || hashClean.includes('type=signup') || tokenHash || authCode;
         if (isSignupConfirm) {
           window.location.replace('verified.html' + window.location.search + window.location.hash);
           return;
         }
 
         // Check if there was an error in URL from Supabase mailer
-        const errorDesc = urlParams.get('error_description') || urlParams.get('error');
+        const errorDesc = getParam('error_description') || getParam('error');
         if (errorDesc) {
-          showToast(decodeURIComponent(errorDesc), 'error');
+          const cleanErr = decodeURIComponent(errorDesc.replace(/\+/g, ' '));
+          showToast(cleanErr, 'error');
           authNoticeBox.className = 'auth-notice error';
-          authNoticeBox.innerHTML = `<div><strong>Verification Issue:</strong> ${decodeURIComponent(errorDesc)}</div>`;
+          authNoticeBox.innerHTML = `<div><strong>Verification Issue:</strong> ${cleanErr}</div>`;
           authNoticeBox.style.display = 'flex';
           return;
         }

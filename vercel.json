@@ -1,0 +1,10 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/verified", "destination": "/verified.html" },
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/app", "destination": "/index.html" },
+    { "source": "/index", "destination": "/index.html" }
+  ]
+}
