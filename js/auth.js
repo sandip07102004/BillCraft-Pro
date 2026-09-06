@@ -212,7 +212,7 @@ window.BillCraftAuth = (() => {
     const sb = getSupabase();
     if (sb) {
       try {
-        const redirectUrl = window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + 'login.html';
+        const redirectUrl = window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + 'verified.html';
         const sbPromise = sb.auth.signUp({
           email: cleanEmail,
           password: password,
@@ -544,7 +544,7 @@ window.BillCraftAuth = (() => {
   const resendVerification = async (email) => {
     const sb = getSupabase();
     const cleanEmail = email.trim().toLowerCase();
-    const redirectUrl = window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + 'login.html';
+    const redirectUrl = window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + 'verified.html';
 
     if (sb) {
       try {
@@ -818,7 +818,7 @@ window.BillCraftAuth = (() => {
   /**
    * Directly confirm a user's email address and activate their session
    */
-  const confirmUserEmail = async (email) => {
+  const confirmUserEmail = async (email, { autoLogin = true } = {}) => {
     const cleanEmail = (email || '').trim().toLowerCase();
     const localAccounts = getLocalAccounts();
     const accountIndex = localAccounts.findIndex(acc => acc.email.toLowerCase() === cleanEmail);
@@ -835,8 +835,10 @@ window.BillCraftAuth = (() => {
         createdAt: localAccounts[accountIndex].createdAt,
         isLocalDev: true
       };
-      currentUser = verifiedUser;
-      notifyAuthChange(currentUser);
+      if (autoLogin) {
+        currentUser = verifiedUser;
+        notifyAuthChange(currentUser);
+      }
       return { success: true, user: verifiedUser };
     }
     return { success: false, error: 'No account found with this email to confirm.' };

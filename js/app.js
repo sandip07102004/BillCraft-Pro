@@ -1861,6 +1861,11 @@
                             (window.location.search || '').includes('code=') ||
                             (window.location.search || '').includes('token_hash=');
 
+      if (hasAuthParams) {
+        window.location.replace('verified.html' + window.location.search + window.location.hash);
+        return;
+      }
+
       const checkAndRedirect = () => {
         if (window.BillCraftAuth && typeof window.BillCraftAuth.whenReady === 'function') {
           window.BillCraftAuth.whenReady().then(() => {
@@ -1873,12 +1878,7 @@
         }
       };
 
-      if (hasAuthParams) {
-        // Allow Supabase SDK a brief moment to process the incoming confirmation code/token
-        setTimeout(checkAndRedirect, 1500);
-      } else {
-        checkAndRedirect();
-      }
+      checkAndRedirect();
     }
   };
 

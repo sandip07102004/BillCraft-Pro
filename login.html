@@ -949,7 +949,7 @@
             </div>
             <div class="verify-step-item">
               <span class="step-num">3</span>
-              <span>This window will automatically detect your confirmation and log you in.</span>
+              <span>Click the link in your email to verify your address, then sign in to your account.</span>
             </div>
           </div>
 
@@ -1266,10 +1266,10 @@
             if (res && res.verified) {
               clearInterval(verifyPollingInterval);
               clearInterval(resendCooldownInterval);
-              showToast('Email verified successfully! Logging you in...', 'success');
+              showToast('Email verified successfully!', 'success');
               setTimeout(() => {
-                triggerRedirect(res.user ? res.user.name : '');
-              }, 700);
+                window.location.href = `verified.html?email=${encodeURIComponent(pendingVerificationEmail)}`;
+              }, 600);
             }
           } catch (e) {
             // Silently wait for next polling tick
@@ -1516,7 +1516,7 @@
       // ================================================================
       const isLoggingOut = () => {
         const p = new URLSearchParams(window.location.search);
-        return p.get('logout') === 'true' || p.get('action') === 'signout' || p.get('deleted') === 'true';
+        return p.get('logout') === 'true' || p.get('action') === 'signout' || p.get('deleted') === 'true' || p.get('verified') === 'true';
       };
 
       let hasRedirected = false;
@@ -1701,6 +1701,37 @@
 
         const hash = window.location.hash || '';
 
+        // Check if user came from email verification page (verified.html)
+        if (urlParams.get('verified') === 'true') {
+          if (window.BillCraftAuth) {
+            await window.BillCraftAuth.signOut();
+          }
+          switchTab('signin');
+          const verifiedEmail = urlParams.get('email');
+          if (verifiedEmail && siEmail) {
+            siEmail.value = decodeURIComponent(verifiedEmail);
+            if (siPassword) siPassword.focus();
+          }
+          authNoticeBox.className = 'auth-notice success';
+          authNoticeBox.innerHTML = `
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <div>
+              <strong>Email verified successfully!</strong> Please enter your password to sign in.
+            </div>
+          `;
+          authNoticeBox.style.display = 'flex';
+          return; // Stop here! User must sign in!
+        }
+
+        // If incoming confirmation link was directed to login.html, forward to verified.html
+        const tokenHash = urlParams.get('token_hash');
+        const authCode = urlParams.get('code');
+        const isSignupConfirm = (urlParams.get('type') === 'signup') || hash.includes('type=signup') || tokenHash || authCode;
+        if (isSignupConfirm) {
+          window.location.replace('verified.html' + window.location.search + window.location.hash);
+          return;
+        }
+
         // Check if there was an error in URL from Supabase mailer
         const errorDesc = urlParams.get('error_description') || urlParams.get('error');
         if (errorDesc) {
@@ -1708,65 +1739,6 @@
           authNoticeBox.className = 'auth-notice error';
           authNoticeBox.innerHTML = `<div><strong>Verification Issue:</strong> ${decodeURIComponent(errorDesc)}</div>`;
           authNoticeBox.style.display = 'flex';
-          return;
-        }
-
-        // 1. Handle token_hash from Supabase confirmation email (email verification link)
-        const tokenHash = urlParams.get('token_hash');
-        const otpType = urlParams.get('type') || 'signup';
-        if (tokenHash) {
-          showToast('Verifying email link...', 'info');
-          try {
-            const client = window.BillCraftDB?.client;
-            if (client && client.auth && client.auth.verifyOtp) {
-              const { data, error } = await client.auth.verifyOtp({ token_hash: tokenHash, type: otpType });
-              if (!error && data?.session) {
-                showToast('Email verified! Directing to workspace...', 'success');
-                triggerRedirect(data.user?.user_metadata?.full_name || data.user?.email);
-                return;
-              } else if (error) {
-                authNoticeBox.className = 'auth-notice warning';
-                authNoticeBox.innerHTML = `<div><strong>Verification link error:</strong> ${error.message}</div>`;
-                authNoticeBox.style.display = 'flex';
-              }
-            }
-          } catch (e) {
-            console.warn('Verify token_hash error:', e);
-          }
-        }
-
-        // 2. Handle PKCE code exchange from email link
-        const authCode = urlParams.get('code');
-        if (authCode) {
-          showToast('Exchanging verification code...', 'info');
-          try {
-            const client = window.BillCraftDB?.client;
-            if (client && client.auth && client.auth.exchangeCodeForSession) {
-              const { data, error } = await client.auth.exchangeCodeForSession(authCode);
-              if (!error && data?.session) {
-                showToast('Email verified! Directing to workspace...', 'success');
-                triggerRedirect(data.user?.user_metadata?.full_name || data.user?.email);
-                return;
-              } else if (error) {
-                authNoticeBox.className = 'auth-notice warning';
-                authNoticeBox.innerHTML = `<div><strong>Verification code error:</strong> ${error.message}</div>`;
-                authNoticeBox.style.display = 'flex';
-              }
-            }
-          } catch (e) {
-            console.warn('Exchange code error:', e);
-          }
-        }
-
-        // 3. Handle implicit hash (#access_token=...)
-        if (hash.includes('access_token') || hash.includes('type=signup') || hash.includes('type=recovery')) {
-          showToast('Email confirmation detected! Logging you in...', 'success');
-          setTimeout(async () => {
-            const current = window.BillCraftAuth.getCurrentUser();
-            if (current && current.email) {
-              triggerRedirect(current.name);
-            }
-          }, 800);
           return;
         }
 
