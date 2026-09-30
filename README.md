@@ -7,6 +7,24 @@ A modern, high-performance web billing and invoice management platform built wit
 
 
 
+---
+
+## 📸 Application Previews
+
+<div align="center">
+
+### 1. Cloud Authentication & Billing Studio
+<img src="assets/screenshots/1_login_portal.png" alt="BillCraft Pro Authentication Portal" width="100%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);" />
+
+<br/><br/>
+
+### 2. Live High-Resolution Invoice Document
+<img src="assets/screenshots/2_invoice_sample.jpg" alt="Sample Generated Invoice" width="85%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);" />
+
+</div>
+
+---
+
 ## 📱 Mobile Application (Android)
 BillCraft Pro is packaged as a native Android application using **Capacitor**:
 - **Direct Download**: [Download Latest Android APK](https://github.com/sandip07102004/BillCraft-Pro/releases/latest)
