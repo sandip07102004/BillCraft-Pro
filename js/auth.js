@@ -123,11 +123,91 @@ window.BillCraftAuth = (() => {
     );
   };
 
+  const getAuthRedirectUrl = (defaultPage = 'verified.html') => {
+    const isCapacitor = Boolean(
+      (window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()) ||
+      (window.Capacitor && window.Capacitor.platform !== 'web') ||
+      window.location.protocol === 'capacitor:' ||
+      (window.location.hostname === 'localhost' && window.Capacitor)
+    );
+    if (isCapacitor) {
+      return 'com.billcraft.pro://auth/callback';
+    }
+    return window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + defaultPage;
+  };
+
+  const handleDeepLinkAuth = async (urlStr) => {
+    if (!urlStr || !urlStr.includes('com.billcraft.pro')) return false;
+    try {
+      console.log('[BillCraft Auth] Deep link received:', urlStr);
+      const sb = getSupabase();
+      if (!sb) return false;
+
+      let paramsString = '';
+      if (urlStr.includes('#')) {
+        paramsString = urlStr.split('#')[1];
+      } else if (urlStr.includes('?')) {
+        paramsString = urlStr.split('?')[1];
+      }
+
+      if (!paramsString) return false;
+      const params = new URLSearchParams(paramsString);
+      const accessToken = params.get('access_token');
+      const refreshToken = params.get('refresh_token');
+      const code = params.get('code');
+
+      if (accessToken && refreshToken) {
+        const { data, error } = await sb.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken
+        });
+        if (!error && data && data.session) {
+          currentUser = mapSupabaseUser(data.session.user);
+          notifyAuthChange(currentUser);
+          if (!window.location.pathname.endsWith('index.html') && !window.location.pathname.endsWith('/')) {
+            window.location.replace('index.html');
+          }
+          return true;
+        }
+      } else if (code) {
+        const { data, error } = await sb.auth.exchangeCodeForSession(code);
+        if (!error && data && data.session) {
+          currentUser = mapSupabaseUser(data.session.user);
+          notifyAuthChange(currentUser);
+          if (!window.location.pathname.endsWith('index.html') && !window.location.pathname.endsWith('/')) {
+            window.location.replace('index.html');
+          }
+          return true;
+        }
+      }
+    } catch (e) {
+      console.warn('[BillCraft Auth] Deep link handling notice:', e);
+    }
+    return false;
+  };
+
   // ==========================================================================
   // INITIALIZATION & SESSION RESTORE
   // ==========================================================================
 
   const initAuth = async () => {
+    // Check Capacitor Deep Link Listener
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+      try {
+        window.Capacitor.Plugins.App.addListener('appUrlOpen', (data) => {
+          if (data && data.url) {
+            handleDeepLinkAuth(data.url);
+          }
+        });
+        window.Capacitor.Plugins.App.getLaunchUrl().then((launchData) => {
+          if (launchData && launchData.url) {
+            handleDeepLinkAuth(launchData.url);
+          }
+        }).catch(() => {});
+      } catch (e) {
+        console.warn('[BillCraft Auth] Capacitor App deep link listener setup notice:', e);
+      }
+    }
     // 1. Quick load from local cache so UI does not flicker
     const cached = loadLocalSession();
     if (cached) {
@@ -212,7 +292,7 @@ window.BillCraftAuth = (() => {
     const sb = getSupabase();
     if (sb) {
       try {
-        const redirectUrl = window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + 'verified.html';
+        const redirectUrl = getAuthRedirectUrl('verified.html');
         const sbPromise = sb.auth.signUp({
           email: cleanEmail,
           password: password,
@@ -544,7 +624,7 @@ window.BillCraftAuth = (() => {
   const resendVerification = async (email) => {
     const sb = getSupabase();
     const cleanEmail = email.trim().toLowerCase();
-    const redirectUrl = window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + 'verified.html';
+    const redirectUrl = getAuthRedirectUrl('verified.html');
 
     if (sb) {
       try {
@@ -630,7 +710,7 @@ window.BillCraftAuth = (() => {
     if (!sb) return { success: false, error: 'Supabase is offline. Please use password sign-in.' };
 
     const cleanEmail = email.trim().toLowerCase();
-    const redirectUrl = window.location.origin + window.location.pathname;
+    const redirectUrl = getAuthRedirectUrl('login.html');
 
     try {
       const { error } = await sb.auth.signInWithOtp({

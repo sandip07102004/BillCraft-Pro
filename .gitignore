@@ -7,13 +7,33 @@ desktop.ini
 .vscode/
 .idea/
 *.swp
+*.iml
 
-# Agent & AI local configurations
-.agents/
-
-# Logs & Temp
-*.log
+# Node & Package Manager
+node_modules/
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Android Build & Local Properties
+android/local.properties
+android/.gradle/
+android/app/build/
+android/build/
+.gradle/
+*.apk
+www/
+mobile/
+
+# Temporary / Scratch & Helper Scripts
+scratch/
+.agents/
+*.ps1
+download-logo.js
+fetch-jdk.js
+prepare-assets.js
+
+# Logs
+*.log
 push.bat
 git.cmd
-

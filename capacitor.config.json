@@ -1,0 +1,13 @@
+{
+  "appId": "com.billcraft.pro",
+  "appName": "BillCraft Pro",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "CapacitorCookies": {
+      "enabled": true
+    }
+  }
+}

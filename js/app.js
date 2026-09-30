@@ -1194,7 +1194,32 @@
 
       const pdfWorker = html2pdf().set(opt).from(invoiceElement);
       const pdfBlob = await pdfWorker.outputPdf('blob');
-      await pdfWorker.save();
+      
+      // Native Mobile PDF Sharing & Saving Support
+      let handledViaNativeShare = false;
+      try {
+        if (navigator.canShare && typeof File !== 'undefined') {
+          const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+          if (navigator.canShare({ files: [pdfFile] })) {
+            await navigator.share({
+              files: [pdfFile],
+              title: fileName,
+              text: `Invoice ${currentInvoice.metadata?.number || ''}`
+            });
+            handledViaNativeShare = true;
+          }
+        }
+      } catch (shareErr) {
+        if (shareErr.name !== 'AbortError') {
+          console.warn('[BillCraft] Native share fallback:', shareErr);
+        } else {
+          handledViaNativeShare = true;
+        }
+      }
+
+      if (!handledViaNativeShare) {
+        await pdfWorker.save();
+      }
       showToast(`PDF exported: ${fileName}`);
 
       // Automatically backup the generated PDF to Supabase Storage 'invoice-pdfs'
@@ -1904,6 +1929,33 @@
 
     // 4. Initial check of Supabase connection status
     updateSupabaseAccountStatus();
+
+    // 5. Native Android Hardware Back Button Integration
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+      try {
+        window.Capacitor.Plugins.App.addListener('backButton', () => {
+          // If User Account details popup is open, close it
+          if (el.userDropdownMenu && el.userDropdownMenu.classList.contains('show')) {
+            closeUserDetailsPopup();
+            return;
+          }
+          // If History drawer is open, close it
+          if (el.historyDrawer && el.historyDrawer.classList.contains('open')) {
+            closeDrawer();
+            return;
+          }
+          // If viewing Live Preview on mobile, return to Editor form
+          if (el.tabPreviewBtn && el.tabPreviewBtn.classList.contains('active')) {
+            if (el.tabEditorBtn) el.tabEditorBtn.click();
+            return;
+          }
+          // Otherwise, minimize/exit app
+          window.Capacitor.Plugins.App.exitApp();
+        });
+      } catch (backErr) {
+        console.warn('[BillCraft] Android back button listener note:', backErr);
+      }
+    }
 
     console.log('BillCraft Studio initialized successfully.');
   };

@@ -1,0 +1,22 @@
+{
+  "name": "billcraft-pro",
+  "version": "1.0.0",
+  "description": "BillCraft Pro Studio - Mobile & Web Billing Platform",
+  "main": "index.html",
+  "scripts": {
+    "build": "node sync-web.js",
+    "cap:sync": "node sync-web.js && cap sync",
+    "cap:open:android": "cap open android"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/app": "^7.0.0",
+    "@capacitor/cli": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/filesystem": "^7.0.0",
+    "@capacitor/share": "^7.0.0"
+  }
+}
