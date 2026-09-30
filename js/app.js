@@ -1195,28 +1195,89 @@
       const pdfWorker = html2pdf().set(opt).from(invoiceElement);
       const pdfBlob = await pdfWorker.outputPdf('blob');
       
-      // Native Mobile PDF Sharing & Saving Support
+      // Native Mobile PDF Sharing & Saving Support (Capacitor Native Android + Browser Fallback)
       let handledViaNativeShare = false;
-      try {
-        if (navigator.canShare && typeof File !== 'undefined') {
-          const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
-          if (navigator.canShare({ files: [pdfFile] })) {
-            await navigator.share({
-              files: [pdfFile],
+
+      // 1. Capacitor Native Android / iOS Integration
+      const isNativeApp = typeof window.Capacitor !== 'undefined' && 
+                          typeof window.Capacitor.isNativePlatform === 'function' && 
+                          window.Capacitor.isNativePlatform();
+
+      if (isNativeApp && window.Capacitor.Plugins) {
+        try {
+          const { Filesystem, Share } = window.Capacitor.Plugins;
+          // Convert blob to base64
+          const base64Data = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              const res = reader.result;
+              const b64 = typeof res === 'string' ? res.split(',')[1] : '';
+              resolve(b64);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(pdfBlob);
+          });
+
+          let fileUri = null;
+          if (Filesystem && base64Data) {
+            try {
+              const writeRes = await Filesystem.writeFile({
+                path: fileName,
+                data: base64Data,
+                directory: 'DOCUMENTS',
+                recursive: true
+              });
+              fileUri = writeRes && writeRes.uri;
+            } catch (fsErr) {
+              console.warn('[BillCraft] Documents write fallback to Cache:', fsErr);
+              const cacheRes = await Filesystem.writeFile({
+                path: fileName,
+                data: base64Data,
+                directory: 'CACHE',
+                recursive: true
+              });
+              fileUri = cacheRes && cacheRes.uri;
+            }
+          }
+
+          if (Share && fileUri) {
+            await Share.share({
               title: fileName,
-              text: `Invoice ${currentInvoice.metadata?.number || ''}`
+              text: `Invoice ${currentInvoice.metadata?.number || ''}`,
+              url: fileUri,
+              dialogTitle: 'Save or Share Invoice PDF'
             });
             handledViaNativeShare = true;
           }
-        }
-      } catch (shareErr) {
-        if (shareErr.name !== 'AbortError') {
-          console.warn('[BillCraft] Native share fallback:', shareErr);
-        } else {
-          handledViaNativeShare = true;
+        } catch (capErr) {
+          console.warn('[BillCraft] Capacitor native PDF export error:', capErr);
         }
       }
 
+      // 2. Web Browser Native Sharing Fallback
+      if (!handledViaNativeShare) {
+        try {
+          if (navigator.canShare && typeof File !== 'undefined') {
+            const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+            if (navigator.canShare({ files: [pdfFile] })) {
+              await navigator.share({
+                files: [pdfFile],
+                title: fileName,
+                text: `Invoice ${currentInvoice.metadata?.number || ''}`
+              });
+              handledViaNativeShare = true;
+            }
+          }
+        } catch (shareErr) {
+          if (shareErr.name !== 'AbortError') {
+            console.warn('[BillCraft] Web share fallback:', shareErr);
+          } else {
+            handledViaNativeShare = true;
+          }
+        }
+      }
+
+      // 3. Direct Browser Download Fallback
       if (!handledViaNativeShare) {
         await pdfWorker.save();
       }
