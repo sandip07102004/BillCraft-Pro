@@ -4,7 +4,7 @@
   "description": "BillCraft Pro Studio - Mobile & Web Billing Platform",
   "main": "index.html",
   "scripts": {
-    "build": "node sync-web.js",
+    "cap:prepare": "node sync-web.js",
     "cap:sync": "node sync-web.js && cap sync",
     "cap:open:android": "cap open android"
   },
