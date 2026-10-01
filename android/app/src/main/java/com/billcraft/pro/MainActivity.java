@@ -15,6 +15,17 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(NativePrintPlugin.class);
         super.onCreate(savedInstanceState);
 
+        // Hardware accelerated WebView setup with zero-flash white background
+        try {
+            WebView webView = getBridge().getWebView();
+            webView.setBackgroundColor(android.graphics.Color.WHITE);
+            webView.setOverScrollMode(android.view.View.OVER_SCROLL_NEVER);
+            android.webkit.WebSettings settings = webView.getSettings();
+            settings.setDomStorageEnabled(true);
+            settings.setDatabaseEnabled(true);
+            settings.setCacheMode(android.webkit.WebSettings.LOAD_DEFAULT);
+        } catch (Exception ignored) {}
+
         // Also register direct JavaScript Interface window.AndroidPrint.print() for webview
         try {
             WebView webView = getBridge().getWebView();

@@ -1387,6 +1387,48 @@ body.page-exit {
   border-left: 4px solid var(--success);
 }
 .toast-notification.info {
+
+/* Mobile & Native APK Pop Message (Toast) Centered Placement */
+@media (max-width: 860px) {
+  .toast-notification {
+    bottom: calc(20px + env(safe-area-inset-bottom, 16px)) !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translate3d(-50%, 20px, 0) scale(0.96) !important;
+    max-width: min(92vw, 420px) !important;
+    width: max-content !important;
+    justify-content: center !important;
+    text-align: center !important;
+    padding: 12px 20px !important;
+    font-size: 0.85rem !important;
+    border-radius: 9999px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28) !important;
+  }
+
+  .toast-notification.show {
+    transform: translate3d(-50%, 0, 0) scale(1) !important;
+  }
+}
+
+.is-apk-native .toast-notification {
+  bottom: calc(24px + env(safe-area-inset-bottom, 16px)) !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translate3d(-50%, 20px, 0) scale(0.96) !important;
+  max-width: min(92vw, 420px) !important;
+  width: max-content !important;
+  justify-content: center !important;
+  text-align: center !important;
+  padding: 12px 22px !important;
+  font-size: 0.85rem !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3) !important;
+}
+
+.is-apk-native .toast-notification.show {
+  transform: translate3d(-50%, 0, 0) scale(1) !important;
+}
+
   background-color: var(--primary-dark);
   border-left: 4px solid var(--secondary);
 }
@@ -1480,8 +1522,13 @@ body.page-exit {
   @keyframes mobilePanelFadeIn {
     from {
       opacity: 0;
-      transform: translate3d(0, 8px, 0);
+      transform: translate3d(0, 6px, 0);
     }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
     to {
       opacity: 1;
       transform: translate3d(0, 0, 0);
