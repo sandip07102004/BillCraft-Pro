@@ -1396,9 +1396,44 @@
     }
   };
 
-  const printInvoice = () => {
+  const printInvoice = async () => {
     readFormToState();
     updateFinancialsAndPreview();
+
+    const isNativeApp = typeof window.Capacitor !== 'undefined' && 
+                        typeof window.Capacitor.isNativePlatform === 'function' && 
+                        window.Capacitor.isNativePlatform();
+
+    if (isNativeApp) {
+      let printTriggered = false;
+
+      // 1. Try direct AndroidPrint JS interface
+      if (window.AndroidPrint && typeof window.AndroidPrint.print === 'function') {
+        try {
+          window.AndroidPrint.print();
+          printTriggered = true;
+        } catch (e) {
+          console.warn('[BillCraft] AndroidPrint error:', e);
+        }
+      }
+
+      // 2. Try Capacitor NativePrint plugin
+      if (!printTriggered && window.Capacitor?.Plugins?.NativePrint) {
+        try {
+          await window.Capacitor.Plugins.NativePrint.print();
+          printTriggered = true;
+        } catch (e) {
+          console.warn('[BillCraft] NativePrint plugin error:', e);
+        }
+      }
+
+      if (printTriggered) {
+        showToast('Opening native print service...');
+        return;
+      }
+    }
+
+    // Default web print
     window.print();
   };
 
