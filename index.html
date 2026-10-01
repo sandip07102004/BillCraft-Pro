@@ -33,6 +33,44 @@
       }
     })();
   </script>
+  <!-- Instant Synchronous Auth Guard (Eliminates Billing Page Glitch / Flash before Login) -->
+  <script>
+    (function() {
+      try {
+        var hash = window.location.hash || '';
+        var search = window.location.search || '';
+
+        // If URL contains incoming confirmation/reset tokens from Supabase, route directly to verified.html
+        if (hash.includes('access_token') || hash.includes('type=signup') || search.includes('code=') || search.includes('token_hash=')) {
+          document.documentElement.style.visibility = 'hidden';
+          window.location.replace('verified.html' + search + hash);
+          return;
+        }
+
+        // Check if an authenticated user session is active in localStorage
+        var sessionUser = localStorage.getItem('billcraft_user');
+        var hasSbSession = false;
+        for (var i = 0; i < localStorage.length; i++) {
+          var k = localStorage.key(i) || '';
+          if (k.indexOf('-auth-token') !== -1 || k === 'billcraft_supabase_auth') {
+            var val = localStorage.getItem(k);
+            if (val && val !== 'null' && val !== '{}') {
+              hasSbSession = true;
+              break;
+            }
+          }
+        }
+
+        // If NOT authenticated, hide document immediately and redirect to login.html before body paints
+        if (!sessionUser && !hasSbSession) {
+          document.documentElement.style.visibility = 'hidden';
+          window.location.replace('login.html');
+        }
+      } catch (e) {
+        // Fallback safely if localStorage access is restricted
+      }
+    })();
+  </script>
 </head>
 <body>
 
