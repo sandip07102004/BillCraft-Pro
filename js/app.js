@@ -837,7 +837,7 @@
     try {
       await new Promise(r => setTimeout(r, 60));
       const opt = {
-        margin: [8, 8, 8, 8],
+        margin: [6, 8, 6, 8],
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { 
           scale: 2, 
@@ -1241,7 +1241,7 @@
       await new Promise(r => setTimeout(r, 80));
 
       const opt = {
-        margin: [8, 8, 8, 8],
+        margin: [6, 8, 6, 8],
         filename: fileName,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: {

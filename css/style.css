@@ -2686,7 +2686,7 @@ body.page-exit {
   min-width: 780px !important;
   max-width: 780px !important;
   margin: 0 !important;
-  padding: 24px 28px 20px !important;
+  padding: 18px 26px 8px !important;
   min-height: 0 !important;
   box-shadow: none !important;
   border: 1px solid #E2E8F0 !important;
@@ -2697,42 +2697,42 @@ body.page-exit {
 
 .pdf-export-single-page .inv-header-row {
   margin-top: 0 !important;
-  padding-top: 4px !important;
-  margin-bottom: 14px !important;
+  padding-top: 2px !important;
+  margin-bottom: 10px !important;
 }
 
 .pdf-export-single-page .inv-main-heading {
-  font-size: 1.85rem !important;
-  margin-bottom: 3px !important;
+  font-size: 1.8rem !important;
+  margin-bottom: 2px !important;
 }
 
 .pdf-export-single-page .inv-company-name {
-  font-size: 1.35rem !important;
+  font-size: 1.3rem !important;
   margin-bottom: 2px !important;
 }
 
 .pdf-export-single-page .inv-logo-img {
-  max-height: 46px !important;
+  max-height: 42px !important;
 }
 
 .pdf-export-single-page .inv-sender-text {
-  font-size: 0.78rem !important;
-  line-height: 1.35 !important;
+  font-size: 0.76rem !important;
+  line-height: 1.32 !important;
 }
 
 .pdf-export-single-page .inv-details-grid {
-  padding: 10px 14px !important;
-  margin-bottom: 12px !important;
-  gap: 18px !important;
+  padding: 8px 12px !important;
+  margin-bottom: 8px !important;
+  gap: 14px !important;
 }
 
 .pdf-export-single-page .inv-client-name {
-  font-size: 1rem !important;
+  font-size: 0.95rem !important;
 }
 
 .pdf-export-single-page .inv-client-details,
 .pdf-export-single-page .inv-meta-table {
-  font-size: 0.78rem !important;
+  font-size: 0.76rem !important;
 }
 
 .pdf-export-single-page .inv-table {
@@ -2741,7 +2741,7 @@ body.page-exit {
   max-width: 100% !important;
   box-sizing: border-box !important;
   table-layout: fixed !important;
-  margin-bottom: 10px !important;
+  margin-bottom: 8px !important;
 }
 
 .pdf-export-single-page .inv-table th:first-child,
@@ -2762,13 +2762,13 @@ body.page-exit {
 }
 
 .pdf-export-single-page .inv-table th {
-  padding: 7px 10px !important;
+  padding: 6px 10px !important;
   font-size: 0.72rem !important;
 }
 
 .pdf-export-single-page .inv-table td {
-  padding: 6px 10px !important;
-  font-size: 0.8rem !important;
+  padding: 5px 10px !important;
+  font-size: 0.78rem !important;
 }
 
 .pdf-export-single-page .inv-summary-container {
@@ -2778,9 +2778,9 @@ body.page-exit {
   align-items: flex-start !important;
   width: 100% !important;
   box-sizing: border-box !important;
-  margin-top: 4px !important;
-  margin-bottom: 12px !important;
-  gap: 16px !important;
+  margin-top: 2px !important;
+  margin-bottom: 6px !important;
+  gap: 14px !important;
 }
 
 .pdf-export-single-page .inv-payment-notes {
@@ -2790,8 +2790,8 @@ body.page-exit {
 }
 
 .pdf-export-single-page .inv-notes-box {
-  padding: 6px 10px !important;
-  font-size: 0.75rem !important;
+  padding: 5px 8px !important;
+  font-size: 0.73rem !important;
 }
 
 .pdf-export-single-page .inv-calc-box {
@@ -2803,24 +2803,28 @@ body.page-exit {
 }
 
 .pdf-export-single-page .inv-calc-row {
-  padding: 3px 0 !important;
-  font-size: 0.8rem !important;
+  padding: 2px 0 !important;
+  font-size: 0.78rem !important;
 }
 
 .pdf-export-single-page .inv-grand-total {
-  padding: 7px 12px !important;
-  margin-top: 6px !important;
-  font-size: 1.1rem !important;
+  padding: 6px 10px !important;
+  margin-top: 4px !important;
+  font-size: 1.05rem !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
 }
 
 .pdf-export-single-page .inv-footer {
-  padding-top: 10px !important;
-  margin-top: auto !important;
+  padding-top: 6px !important;
+  margin-top: 4px !important;
+  border-top: 1px solid #E2E8F0 !important;
+  box-sizing: border-box !important;
 }
 
 .pdf-export-single-page .inv-signature-line {
-  height: 24px !important;
-  margin-bottom: 3px !important;
+  height: 18px !important;
+  margin-bottom: 2px !important;
 }
 
 /* Print Styles (@media print) */
