@@ -2651,27 +2651,53 @@ body.page-exit {
    Calibrated for a Single-Page A4 Print and Export with zero page overflow
    ========================================================================== */
 
+/* html2pdf export capture container isolation (prevents right/top cut-off on mobile devices) */
+.html2pdf__overlay {
+  position: fixed !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 780px !important;
+  min-width: 780px !important;
+  max-width: 780px !important;
+  height: 100% !important;
+  overflow: visible !important;
+  z-index: 99999 !important;
+  background-color: transparent !important;
+}
+
+.html2pdf__container {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  right: auto !important;
+  margin: 0 !important;
+  width: 780px !important;
+  min-width: 780px !important;
+  max-width: 780px !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+  background-color: #ffffff !important;
+}
+
 /* Single-Page PDF Export Profile (applied dynamically during html2pdf export) */
 .pdf-export-single-page {
   box-sizing: border-box !important;
-  width: 100% !important;
-  max-width: 100% !important;
+  width: 780px !important;
+  min-width: 780px !important;
+  max-width: 780px !important;
   margin: 0 !important;
-  padding: 28px 24px 20px !important;
+  padding: 24px 28px 20px !important;
   min-height: 0 !important;
   box-shadow: none !important;
   border: 1px solid #E2E8F0 !important;
   background: #FFFFFF !important;
   transform: none !important;
+  overflow: visible !important;
 }
 
 .pdf-export-single-page .inv-header-row {
   margin-top: 0 !important;
   padding-top: 4px !important;
-  margin-bottom: 14px !important;
-}
-
-.pdf-export-single-page .inv-header-row {
   margin-bottom: 14px !important;
 }
 
@@ -2711,8 +2737,28 @@ body.page-exit {
 
 .pdf-export-single-page .inv-table {
   width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
   box-sizing: border-box !important;
+  table-layout: fixed !important;
   margin-bottom: 10px !important;
+}
+
+.pdf-export-single-page .inv-table th:first-child,
+.pdf-export-single-page .inv-table td:first-child {
+  width: 52% !important;
+}
+.pdf-export-single-page .inv-table th:nth-child(2),
+.pdf-export-single-page .inv-table td:nth-child(2) {
+  width: 14% !important;
+}
+.pdf-export-single-page .inv-table th:nth-child(3),
+.pdf-export-single-page .inv-table td:nth-child(3) {
+  width: 17% !important;
+}
+.pdf-export-single-page .inv-table th:last-child,
+.pdf-export-single-page .inv-table td:last-child {
+  width: 17% !important;
 }
 
 .pdf-export-single-page .inv-table th {
@@ -2726,9 +2772,21 @@ body.page-exit {
 }
 
 .pdf-export-single-page .inv-summary-container {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
   margin-top: 4px !important;
   margin-bottom: 12px !important;
   gap: 16px !important;
+}
+
+.pdf-export-single-page .inv-payment-notes {
+  flex: 1 !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
 }
 
 .pdf-export-single-page .inv-notes-box {
@@ -2738,6 +2796,10 @@ body.page-exit {
 
 .pdf-export-single-page .inv-calc-box {
   width: 250px !important;
+  min-width: 250px !important;
+  max-width: 250px !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
 }
 
 .pdf-export-single-page .inv-calc-row {

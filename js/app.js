@@ -821,11 +821,23 @@
       el.previewPanel.style.visibility = 'visible';
     }
 
+    let prevWrapperStyle = {};
+    if (el.previewPaperWrapper) {
+      prevWrapperStyle = {
+        width: el.previewPaperWrapper.style.width,
+        transform: el.previewPaperWrapper.style.transform,
+        overflow: el.previewPaperWrapper.style.overflow
+      };
+      el.previewPaperWrapper.style.width = '780px';
+      el.previewPaperWrapper.style.transform = 'none';
+      el.previewPaperWrapper.style.overflow = 'visible';
+    }
+
     invoiceElement.classList.add('pdf-export-single-page');
     try {
       await new Promise(r => setTimeout(r, 60));
       const opt = {
-        margin: [10, 10, 10, 10],
+        margin: [8, 8, 8, 8],
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { 
           scale: 2, 
@@ -835,7 +847,8 @@
           scrollX: 0,
           y: 0,
           x: 0,
-          windowWidth: 1024 
+          width: 780,
+          windowWidth: 780 
         },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: 'css' }
@@ -847,9 +860,17 @@
       return null;
     } finally {
       invoiceElement.classList.remove('pdf-export-single-page');
+      if (el.previewPaperWrapper) {
+        el.previewPaperWrapper.style.width = prevWrapperStyle.width || '';
+        el.previewPaperWrapper.style.transform = prevWrapperStyle.transform || '';
+        el.previewPaperWrapper.style.overflow = prevWrapperStyle.overflow || '';
+      }
       if (isMobileHidden) {
         el.previewPanel.style.position = prevStyle.position;
         el.previewPanel.style.left = prevStyle.left;
+        el.previewPanel.style.top = prevStyle.top;
+        el.previewPanel.style.width = prevStyle.width;
+        el.previewPanel.style.transform = prevStyle.transform;
         el.previewPanel.style.visibility = prevStyle.visibility;
         el.previewPanel.style.display = prevStyle.display;
         el.previewPanel.classList.add('mobile-hidden');
@@ -1196,19 +1217,31 @@
       el.previewPanel.style.visibility = 'visible';
     }
 
+    let prevWrapperStyle = {};
+    if (el.previewPaperWrapper) {
+      prevWrapperStyle = {
+        width: el.previewPaperWrapper.style.width,
+        transform: el.previewPaperWrapper.style.transform,
+        overflow: el.previewPaperWrapper.style.overflow
+      };
+      el.previewPaperWrapper.style.width = '780px';
+      el.previewPaperWrapper.style.transform = 'none';
+      el.previewPaperWrapper.style.overflow = 'visible';
+    }
+
+    const invoiceElement = el.previewCard;
+    const clientNameSafe = (currentInvoice.client?.name || 'Client').replace(/[^a-zA-Z0-9]/g, '_');
+    const fileName = `${currentInvoice.metadata.number || 'Invoice'}_${clientNameSafe}.pdf`;
+
+    // Apply single-page optimization profile during PDF canvas snapshot
+    invoiceElement.classList.add('pdf-export-single-page');
+
     try {
       // Brief tick for DOM geometry settlement
       await new Promise(r => setTimeout(r, 80));
 
-      const invoiceElement = el.previewCard;
-      const clientNameSafe = (currentInvoice.client?.name || 'Client').replace(/[^a-zA-Z0-9]/g, '_');
-      const fileName = `${currentInvoice.metadata.number || 'Invoice'}_${clientNameSafe}.pdf`;
-
-      // Apply single-page optimization profile during PDF canvas snapshot
-      invoiceElement.classList.add('pdf-export-single-page');
-
       const opt = {
-        margin: [10, 10, 10, 10],
+        margin: [8, 8, 8, 8],
         filename: fileName,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: {
@@ -1219,7 +1252,8 @@
           scrollX: 0,
           y: 0,
           x: 0,
-          windowWidth: 1024
+          width: 780,
+          windowWidth: 780
         },
         jsPDF: {
           unit: 'mm',
@@ -1233,8 +1267,6 @@
       const pdfBlob = await pdfWorker.outputPdf('blob');
       
       // Native Mobile PDF Sharing & Saving Support (Capacitor Native Android + Browser Fallback)
-      let handledViaNativeShare = false;
-
       // 1. Capacitor Native Android / iOS Integration
       const isNativeApp = typeof window.Capacitor !== 'undefined' && 
                           typeof window.Capacitor.isNativePlatform === 'function' && 
@@ -1341,12 +1373,20 @@
       console.error('PDF Generation Error:', err);
       showToast('Failed to export PDF', 'info');
     } finally {
-      if (el.previewCard) {
-        el.previewCard.classList.remove('pdf-export-single-page');
+      if (invoiceElement) {
+        invoiceElement.classList.remove('pdf-export-single-page');
+      }
+      if (el.previewPaperWrapper) {
+        el.previewPaperWrapper.style.width = prevWrapperStyle.width || '';
+        el.previewPaperWrapper.style.transform = prevWrapperStyle.transform || '';
+        el.previewPaperWrapper.style.overflow = prevWrapperStyle.overflow || '';
       }
       if (isMobileHidden) {
         el.previewPanel.style.position = prevStyle.position;
         el.previewPanel.style.left = prevStyle.left;
+        el.previewPanel.style.top = prevStyle.top;
+        el.previewPanel.style.width = prevStyle.width;
+        el.previewPanel.style.transform = prevStyle.transform;
         el.previewPanel.style.visibility = prevStyle.visibility;
         el.previewPanel.style.display = prevStyle.display;
         el.previewPanel.classList.add('mobile-hidden');
