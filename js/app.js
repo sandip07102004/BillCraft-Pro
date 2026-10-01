@@ -1252,35 +1252,29 @@
         } catch (capErr) {
           console.warn('[BillCraft] Capacitor native PDF export error:', capErr);
         }
-      }
-
-      // 2. Web Browser Native Sharing Fallback
-      if (!handledViaNativeShare) {
+      } else {
+        // Direct browser file download for web (exact original behavior)
+        let savedSuccessfully = false;
         try {
-          if (navigator.canShare && typeof File !== 'undefined') {
-            const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
-            if (navigator.canShare({ files: [pdfFile] })) {
-              await navigator.share({
-                files: [pdfFile],
-                title: fileName,
-                text: `Invoice ${currentInvoice.metadata?.number || ''}`
-              });
-              handledViaNativeShare = true;
-            }
-          }
-        } catch (shareErr) {
-          if (shareErr.name !== 'AbortError') {
-            console.warn('[BillCraft] Web share fallback:', shareErr);
-          } else {
-            handledViaNativeShare = true;
-          }
+          await pdfWorker.save();
+          savedSuccessfully = true;
+        } catch (saveErr) {
+          console.warn('[BillCraft] pdfWorker.save failed, using direct blob link download:', saveErr);
+        }
+
+        // Direct anchor download fallback if worker.save() failed or was blocked
+        if (!savedSuccessfully && pdfBlob) {
+          const blobUrl = URL.createObjectURL(pdfBlob);
+          const dlAnchor = document.createElement('a');
+          dlAnchor.href = blobUrl;
+          dlAnchor.download = fileName;
+          document.body.appendChild(dlAnchor);
+          dlAnchor.click();
+          document.body.removeChild(dlAnchor);
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 3000);
         }
       }
 
-      // 3. Direct Browser Download Fallback
-      if (!handledViaNativeShare) {
-        await pdfWorker.save();
-      }
       showToast(`PDF exported: ${fileName}`);
 
       // Automatically backup the generated PDF to Supabase Storage 'invoice-pdfs'
