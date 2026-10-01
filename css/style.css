@@ -2706,7 +2706,8 @@ body.page-exit {
   width: 780px !important;
   min-width: 780px !important;
   max-width: 780px !important;
-  height: 100% !important;
+  height: auto !important;
+  min-height: 100% !important;
   overflow: visible !important;
   z-index: 99999 !important;
   background-color: transparent !important;
@@ -2721,6 +2722,8 @@ body.page-exit {
   width: 780px !important;
   min-width: 780px !important;
   max-width: 780px !important;
+  height: auto !important;
+  min-height: 100% !important;
   box-sizing: border-box !important;
   overflow: visible !important;
   background-color: #ffffff !important;
@@ -2733,7 +2736,8 @@ body.page-exit {
   min-width: 780px !important;
   max-width: 780px !important;
   margin: 0 !important;
-  padding: 18px 26px 8px !important;
+  padding: 18px 26px 24px !important;
+  height: auto !important;
   min-height: 0 !important;
   box-shadow: none !important;
   border: 1px solid #E2E8F0 !important;

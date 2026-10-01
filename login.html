@@ -1841,5 +1841,33 @@
     })();
   </script>
 
+
+  <!-- Android Back Button Handler (Safely closes / minimizes APK when back is tapped on Login screen) -->
+  <script>
+    (function() {
+      function exitBillCraftApp() {
+        try {
+          if (window.AndroidApp && typeof window.AndroidApp.exitApp === 'function') {
+            window.AndroidApp.exitApp();
+            return;
+          }
+          if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App && typeof window.Capacitor.Plugins.App.exitApp === 'function') {
+            window.Capacitor.Plugins.App.exitApp();
+            return;
+          }
+        } catch (e) {}
+      }
+
+      document.addEventListener('backbutton', function(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        exitBillCraftApp();
+      }, false);
+
+      window.addEventListener('popstate', function(e) {
+        exitBillCraftApp();
+      });
+    })();
+  </script>
+
 </body>
 </html>

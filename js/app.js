@@ -835,9 +835,11 @@
 
     invoiceElement.classList.add('pdf-export-single-page');
     try {
-      await new Promise(r => setTimeout(r, 60));
+      await new Promise(r => setTimeout(r, 80));
+      const invoiceHeight = Math.ceil(Math.max(invoiceElement.scrollHeight || 0, invoiceElement.offsetHeight || 0, 1050));
+      const captureWindowHeight = Math.max(invoiceHeight + 350, 1600);
       const opt = {
-        margin: [6, 8, 6, 8],
+        margin: [6, 8, 8, 8],
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { 
           scale: 2, 
@@ -848,10 +850,12 @@
           y: 0,
           x: 0,
           width: 780,
-          windowWidth: 780 
+          windowWidth: 780,
+          height: invoiceHeight,
+          windowHeight: captureWindowHeight
         },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: 'css' }
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
       };
       const blob = await html2pdf().set(opt).from(invoiceElement).outputPdf('blob');
       return blob;
@@ -1240,8 +1244,12 @@
       // Brief tick for DOM geometry settlement
       await new Promise(r => setTimeout(r, 80));
 
+      // Compute full rendered height to prevent bottom truncation on mobile devices and desktop
+      const invoiceHeight = Math.ceil(Math.max(invoiceElement.scrollHeight || 0, invoiceElement.offsetHeight || 0, 1050));
+      const captureWindowHeight = Math.max(invoiceHeight + 350, 1600);
+
       const opt = {
-        margin: [6, 8, 6, 8],
+        margin: [6, 8, 8, 8],
         filename: fileName,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: {
@@ -1253,14 +1261,16 @@
           y: 0,
           x: 0,
           width: 780,
-          windowWidth: 780
+          windowWidth: 780,
+          height: invoiceHeight,
+          windowHeight: captureWindowHeight
         },
         jsPDF: {
           unit: 'mm',
           format: 'a4',
           orientation: 'portrait'
         },
-        pagebreak: { mode: 'css' }
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
       };
 
       const pdfWorker = html2pdf().set(opt).from(invoiceElement);

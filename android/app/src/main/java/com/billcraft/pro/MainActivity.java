@@ -7,6 +7,7 @@ import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
+import androidx.activity.OnBackPressedCallback;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
@@ -26,11 +27,12 @@ public class MainActivity extends BridgeActivity {
             settings.setCacheMode(android.webkit.WebSettings.LOAD_DEFAULT);
         } catch (Exception ignored) {}
 
-        // Also register direct JavaScript Interface window.AndroidPrint.print() for webview
+        // Register direct JavaScript Interfaces for WebView
         try {
             WebView webView = getBridge().getWebView();
             webView.post(() -> {
                 try {
+                    // AndroidPrint interface for instant native A4 printing
                     webView.addJavascriptInterface(new Object() {
                         @JavascriptInterface
                         public void print() {
@@ -50,8 +52,54 @@ public class MainActivity extends BridgeActivity {
                             });
                         }
                     }, "AndroidPrint");
+
+                    // AndroidApp interface for clean hardware Back button app minimization / exit
+                    webView.addJavascriptInterface(new Object() {
+                        @JavascriptInterface
+                        public void exitApp() {
+                            runOnUiThread(() -> {
+                                try {
+                                    moveTaskToBack(true);
+                                } catch (Exception ignored) {}
+                            });
+                        }
+                    }, "AndroidApp");
                 } catch (Exception ignored) {}
             });
         } catch (Exception ignored) {}
+
+        // Intercept Android hardware Back button / gesture navigation
+        // If the user is on login.html or has reached the root screen, minimize/close the app cleanly
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                try {
+                    WebView webView = getBridge().getWebView();
+                    String url = webView != null ? webView.getUrl() : "";
+                    if (url != null && (url.contains("login.html") || !webView.canGoBack())) {
+                        moveTaskToBack(true);
+                        return;
+                    }
+                    if (webView != null && webView.canGoBack()) {
+                        webView.goBack();
+                        return;
+                    }
+                } catch (Exception ignored) {}
+                moveTaskToBack(true);
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        try {
+            WebView webView = getBridge().getWebView();
+            String url = webView != null ? webView.getUrl() : "";
+            if (url != null && (url.contains("login.html") || !webView.canGoBack())) {
+                moveTaskToBack(true);
+                return;
+            }
+        } catch (Exception ignored) {}
+        super.onBackPressed();
     }
 }
