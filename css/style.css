@@ -3178,7 +3178,7 @@ html.is-apk-native body {
 }
 
 html.is-apk-native body {
-  padding-top: max(env(safe-area-inset-top, 0px), 8px) !important;
+  padding-top: 0 !important;
 }
 
 html.is-apk-native .app-header {
@@ -3186,6 +3186,18 @@ html.is-apk-native .app-header {
   top: auto !important;
   z-index: 10 !important;
   box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.06) !important;
+  padding: 0 10px !important;
+}
+
+html.is-apk-native .header-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+html.is-apk-native .header-actions .btn {
+  padding: 6px 8px !important;
+  min-height: 34px !important;
 }
 
 html.is-apk-native .mobile-view-tabs {
