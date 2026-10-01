@@ -747,16 +747,29 @@
     return currentUser ? `billcraft_invoices_${currentUser.id}` : 'billcraft_guest_invoices';
   };
 
+  // Immediate synchronous draft save (used on beforeunload, pagehide, blur, change)
+  const saveCurrentDraftNow = () => {
+    if (!currentInvoice) return;
+    try {
+      readFormToState();
+      // Remember active mobile tab if present
+      if (el.tabPreviewBtn && el.tabPreviewBtn.classList.contains('active')) {
+        currentInvoice._activeTab = 'preview';
+      } else {
+        currentInvoice._activeTab = 'editor';
+      }
+      localStorage.setItem(getDraftStorageKey(), JSON.stringify(currentInvoice));
+    } catch (e) {
+      console.warn('[BillCraft] Draft immediate save error:', e);
+    }
+  };
+
   let draftTimeout = null;
   const saveCurrentDraftDebounced = () => {
     clearTimeout(draftTimeout);
     draftTimeout = setTimeout(() => {
-      try {
-        localStorage.setItem(getDraftStorageKey(), JSON.stringify(currentInvoice));
-      } catch (e) {
-        console.warn('Draft auto-save error:', e);
-      }
-    }, 300);
+      saveCurrentDraftNow();
+    }, 200);
   };
 
   const getSavedInvoices = () => {
@@ -1543,6 +1556,15 @@
       input.addEventListener('input', () => {
         readFormToState();
         updateFinancialsAndPreview();
+        saveCurrentDraftDebounced();
+      });
+      input.addEventListener('change', () => {
+        readFormToState();
+        updateFinancialsAndPreview();
+        saveCurrentDraftNow();
+      });
+      input.addEventListener('blur', () => {
+        saveCurrentDraftNow();
       });
     });
 
@@ -1551,12 +1573,14 @@
         readFormToState();
         renderFormLineItems(); // re-render table with proper currency format
         updateFinancialsAndPreview();
+        saveCurrentDraftNow();
       });
     }
 
     el.invoiceStatus.addEventListener('change', () => {
       readFormToState();
       updateFinancialsAndPreview();
+      saveCurrentDraftNow();
     });
 
     // Discount Type toggle
@@ -1564,13 +1588,54 @@
       setDiscountTypeUI('percentage');
       readFormToState();
       updateFinancialsAndPreview();
+      saveCurrentDraftNow();
     });
 
     el.btnDiscountFixed.addEventListener('click', () => {
       setDiscountTypeUI('fixed');
       readFormToState();
       updateFinancialsAndPreview();
+      saveCurrentDraftNow();
     });
+
+    // Track active mobile tabs
+    if (el.tabEditorBtn) {
+      el.tabEditorBtn.addEventListener('click', () => {
+        if (currentInvoice) {
+          currentInvoice._activeTab = 'editor';
+          saveCurrentDraftDebounced();
+        }
+      });
+    }
+    if (el.tabPreviewBtn) {
+      el.tabPreviewBtn.addEventListener('click', () => {
+        if (currentInvoice) {
+          currentInvoice._activeTab = 'preview';
+          saveCurrentDraftDebounced();
+        }
+      });
+    }
+
+    // Lifecycle listeners to guarantee draft persistence on exit/switch/reload
+    window.addEventListener('beforeunload', saveCurrentDraftNow);
+    window.addEventListener('pagehide', saveCurrentDraftNow);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        saveCurrentDraftNow();
+      }
+    });
+
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+      try {
+        window.Capacitor.Plugins.App.addListener('appStateChange', (state) => {
+          if (!state.isActive) {
+            saveCurrentDraftNow();
+          }
+        });
+      } catch (e) {
+        console.warn('[BillCraft] App state listener note:', e);
+      }
+    }
 
     // Logo Upload Listeners
     el.logoDropzone.addEventListener('click', () => {
@@ -1922,6 +1987,12 @@
       }
 
       populateFormFromState();
+
+      // Restore active tab if previously left on preview
+      if (currentInvoice && currentInvoice._activeTab === 'preview' && el.tabPreviewBtn) {
+        el.tabPreviewBtn.click();
+      }
+
       updateHistoryBadge();
       renderHistoryList();
 
