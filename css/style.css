@@ -2657,11 +2657,18 @@ body.page-exit {
   width: 100% !important;
   max-width: 100% !important;
   margin: 0 !important;
-  padding: 20px 24px !important;
+  padding: 28px 24px 20px !important;
   min-height: 0 !important;
   box-shadow: none !important;
   border: 1px solid #E2E8F0 !important;
   background: #FFFFFF !important;
+  transform: none !important;
+}
+
+.pdf-export-single-page .inv-header-row {
+  margin-top: 0 !important;
+  padding-top: 4px !important;
+  margin-bottom: 14px !important;
 }
 
 .pdf-export-single-page .inv-header-row {

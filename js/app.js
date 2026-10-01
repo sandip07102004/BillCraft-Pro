@@ -805,23 +805,38 @@
       prevStyle = {
         position: el.previewPanel.style.position,
         left: el.previewPanel.style.left,
+        top: el.previewPanel.style.top,
+        width: el.previewPanel.style.width,
+        transform: el.previewPanel.style.transform,
         visibility: el.previewPanel.style.visibility,
         display: el.previewPanel.style.display
       };
       el.previewPanel.classList.remove('mobile-hidden');
       el.previewPanel.style.position = 'fixed';
       el.previewPanel.style.left = '-9999px';
+      el.previewPanel.style.top = '0px';
+      el.previewPanel.style.width = '850px';
+      el.previewPanel.style.transform = 'none';
       el.previewPanel.style.display = 'flex';
       el.previewPanel.style.visibility = 'visible';
     }
 
     invoiceElement.classList.add('pdf-export-single-page');
     try {
-      await new Promise(r => setTimeout(r, 50));
+      await new Promise(r => setTimeout(r, 60));
       const opt = {
-        margin: [8, 8, 8, 8],
+        margin: [10, 10, 10, 10],
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false, scrollY: 0, scrollX: 0 },
+        html2canvas: { 
+          scale: 2, 
+          useCORS: true, 
+          logging: false, 
+          scrollY: 0, 
+          scrollX: 0,
+          y: 0,
+          x: 0,
+          windowWidth: 1024 
+        },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: 'css' }
       };
@@ -1165,19 +1180,25 @@
       prevStyle = {
         position: el.previewPanel.style.position,
         left: el.previewPanel.style.left,
+        top: el.previewPanel.style.top,
+        width: el.previewPanel.style.width,
+        transform: el.previewPanel.style.transform,
         visibility: el.previewPanel.style.visibility,
         display: el.previewPanel.style.display
       };
       el.previewPanel.classList.remove('mobile-hidden');
       el.previewPanel.style.position = 'fixed';
       el.previewPanel.style.left = '-9999px';
+      el.previewPanel.style.top = '0px';
+      el.previewPanel.style.width = '850px';
+      el.previewPanel.style.transform = 'none';
       el.previewPanel.style.display = 'flex';
       el.previewPanel.style.visibility = 'visible';
     }
 
     try {
       // Brief tick for DOM geometry settlement
-      await new Promise(r => setTimeout(r, 60));
+      await new Promise(r => setTimeout(r, 80));
 
       const invoiceElement = el.previewCard;
       const clientNameSafe = (currentInvoice.client?.name || 'Client').replace(/[^a-zA-Z0-9]/g, '_');
@@ -1187,7 +1208,7 @@
       invoiceElement.classList.add('pdf-export-single-page');
 
       const opt = {
-        margin: [8, 8, 8, 8],
+        margin: [10, 10, 10, 10],
         filename: fileName,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: {
@@ -1195,7 +1216,10 @@
           useCORS: true,
           logging: false,
           scrollY: 0,
-          scrollX: 0
+          scrollX: 0,
+          y: 0,
+          x: 0,
+          windowWidth: 1024
         },
         jsPDF: {
           unit: 'mm',
@@ -1218,7 +1242,7 @@
 
       if (isNativeApp && window.Capacitor.Plugins) {
         try {
-          const { Filesystem, Share } = window.Capacitor.Plugins;
+          const { Filesystem } = window.Capacitor.Plugins;
           // Convert blob to base64
           const base64Data = await new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -1231,39 +1255,42 @@
             reader.readAsDataURL(pdfBlob);
           });
 
-          let fileUri = null;
+          let fileSaved = false;
           if (Filesystem && base64Data) {
             try {
-              const writeRes = await Filesystem.writeFile({
+              await Filesystem.writeFile({
                 path: fileName,
                 data: base64Data,
                 directory: 'DOCUMENTS',
                 recursive: true
               });
-              fileUri = writeRes && writeRes.uri;
+              fileSaved = true;
+              console.info('[BillCraft] PDF saved directly to Documents:', fileName);
             } catch (fsErr) {
               console.warn('[BillCraft] Documents write fallback to Cache:', fsErr);
-              const cacheRes = await Filesystem.writeFile({
-                path: fileName,
-                data: base64Data,
-                directory: 'CACHE',
-                recursive: true
-              });
-              fileUri = cacheRes && cacheRes.uri;
+              try {
+                await Filesystem.writeFile({
+                  path: fileName,
+                  data: base64Data,
+                  directory: 'CACHE',
+                  recursive: true
+                });
+                fileSaved = true;
+              } catch (cacheErr) {
+                console.warn('[BillCraft] Cache write error:', cacheErr);
+              }
             }
           }
 
-          if (Share && fileUri) {
-            await Share.share({
-              title: fileName,
-              text: `Invoice ${currentInvoice.metadata?.number || ''}`,
-              url: fileUri,
-              dialogTitle: 'Save or Share Invoice PDF'
-            });
-            handledViaNativeShare = true;
+          // Share popup is completely TURNED OFF as requested. Direct save notification:
+          if (fileSaved) {
+            showToast(`PDF saved to Documents: ${fileName}`);
+          } else {
+            showToast(`PDF exported: ${fileName}`);
           }
         } catch (capErr) {
           console.warn('[BillCraft] Capacitor native PDF export error:', capErr);
+          showToast(`PDF exported: ${fileName}`);
         }
       } else {
         // Direct browser file download for web (exact original behavior)
