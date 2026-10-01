@@ -22,6 +22,7 @@ android/app/build/
 android/build/
 .gradle/
 *.apk
+!BillCraft-Pro.apk
 www/
 mobile/
 

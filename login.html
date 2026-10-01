@@ -760,7 +760,87 @@
         padding: 12px 16px;
       }
     }
+  
+    /* ======================================================================
+       APK-NATIVE ONLY OVERRIDES: Perfectly Centered Login Card
+       ====================================================================== */
+    html.is-apk-native,
+    html.is-apk-native body,
+    body.is-apk-native {
+      overflow-y: auto !important;
+      height: auto !important;
+      min-height: 100vh !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      background: var(--bg-app) !important;
+      padding: 24px 16px !important;
+      box-sizing: border-box !important;
+    }
+
+    html.is-apk-native .login-container,
+    body.is-apk-native .login-container {
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      align-items: center !important;
+      height: auto !important;
+      min-height: unset !important;
+      width: 100% !important;
+      max-width: 440px !important;
+      margin: auto !important;
+      padding: 0 !important;
+      box-sizing: border-box !important;
+    }
+
+    html.is-apk-native .brand-panel,
+    body.is-apk-native .brand-panel {
+      display: none !important;
+    }
+
+    html.is-apk-native .auth-panel,
+    body.is-apk-native .auth-panel {
+      width: 100% !important;
+      max-width: 440px !important;
+      min-width: 0 !important;
+      height: auto !important;
+      min-height: unset !important;
+      padding: 32px 24px !important;
+      justify-content: center !important;
+      align-items: center !important;
+      background: #FFFFFF !important;
+      border: 1px solid var(--border-color) !important;
+      border-radius: var(--radius-lg) !important;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04) !important;
+      box-sizing: border-box !important;
+    }
+
+    html.is-apk-native .mobile-brand-banner,
+    body.is-apk-native .mobile-brand-banner {
+      display: flex !important;
+      justify-content: center !important;
+      margin-bottom: 20px !important;
+    }
+
+    html.is-apk-native .auth-panel-inner,
+    body.is-apk-native .auth-panel-inner {
+      width: 100% !important;
+      max-width: 100% !important;
+      animation: none !important;
+      transform: none !important;
+    }
   </style>
+  <!-- Detect Capacitor APK runtime -->
+  <script>
+    (function() {
+      var isApk = (window.Capacitor && (typeof window.Capacitor.isNativePlatform === 'function' ? window.Capacitor.isNativePlatform() : true)) ||
+                  window.location.protocol === 'capacitor:' ||
+                  (window.location.origin === 'https://localhost' && /Android|Capacitor/i.test(navigator.userAgent));
+      if (isApk) {
+        document.documentElement.classList.add('is-apk-native');
+      }
+    })();
+  </script>
 </head>
 <body>
 

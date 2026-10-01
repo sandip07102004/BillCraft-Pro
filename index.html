@@ -22,6 +22,17 @@
   <script src="js/vendor/html2pdf.bundle.min.js"></script>
 
 
+  <!-- Detect Capacitor APK runtime -->
+  <script>
+    (function() {
+      var isApk = (window.Capacitor && (typeof window.Capacitor.isNativePlatform === 'function' ? window.Capacitor.isNativePlatform() : true)) ||
+                  window.location.protocol === 'capacitor:' ||
+                  (window.location.origin === 'https://localhost' && /Android|Capacitor/i.test(navigator.userAgent));
+      if (isApk) {
+        document.documentElement.classList.add('is-apk-native');
+      }
+    })();
+  </script>
 </head>
 <body>
 
